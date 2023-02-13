@@ -7,7 +7,7 @@ import pandas as pd
 
 @pytest.fixture(scope="session")
 def mtcars():
-    return pd.read_csv("./tests/data/mtcars.csv")
+    return pd.read_csv("./test/data/mtcars.csv")
 
 class TestFunkypyheatmap(object):
 
