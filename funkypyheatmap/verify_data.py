@@ -9,4 +9,6 @@ def verify_data(data):
     ), "data must be a dataframe with at least 1 row and 1 column"
     if "id" in data.columns:
         data = data.set_index("id")
+    else:
+        data.index = data.index.astype(str)
     return data

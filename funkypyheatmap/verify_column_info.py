@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from numpy import isnan, nan
+import numpy as np
 from pandas.api.types import is_string_dtype, is_numeric_dtype, is_dict_like
 
 
@@ -48,18 +48,18 @@ def verify_column_info(data, column_info=None):
 
     # checking group
     if "group" not in column_info.columns:
-        column_info["group"] = nan
+        column_info["group"] = np.nan
     assert all(
-        isinstance(s, str) or isnan(s) for s in column_info["group"]
+        isinstance(s, str) or np.isnan(s) for s in column_info["group"]
     ), "column_info must have string groups"
 
     # checking palette
     if "palette" not in column_info.columns:
         column_info["palette"] = "numerical_palette"
         column_info.loc[column_info["geom"] == "pie", "palette"] = "categorical_palette"
-        column_info.loc[column_info["geom"] == "text", "palette"] = nan
+        column_info.loc[column_info["geom"] == "text", "palette"] = np.nan
     assert all(
-        isinstance(s, str) or isnan(s) for s in column_info["palette"]
+        isinstance(s, str) or np.isnan(s) for s in column_info["palette"]
     ), "column_info must have string palettes"
 
     # checking width
@@ -74,7 +74,7 @@ def verify_column_info(data, column_info=None):
     # checking overlay
     if "overlay" not in column_info.columns:
         column_info["overlay"] = False
-    column_info.loc[isnan(column_info["overlay"]), "overlay"] = False
+    column_info.loc[np.isnan(column_info["overlay"]), "overlay"] = False
     assert all(
         isinstance(s, bool) for s in column_info["overlay"]
     ), "column_info must have boolean overlays"

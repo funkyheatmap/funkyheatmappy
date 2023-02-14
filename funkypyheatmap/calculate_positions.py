@@ -2,6 +2,7 @@ import pandas as pd
 from numpy import nan
 from funkypyheatmap.calculate_row_positions import calculate_row_positions
 from funkypyheatmap.calculate_column_positions import calculate_column_positions
+from funkypyheatmap.plot_funkyrect import plot_funkyrect
 
 
 def calculate_positions(
@@ -33,23 +34,33 @@ def calculate_positions(
         plot_row_annotation = True
 
     row_pos = calculate_row_positions(
-        row_info=row_info,
-        row_height=row_height,
-        row_space=row_space,
-        row_bigspace=row_bigspace,
+        row_info=row_info, row_height=row_height, row_space=row_space
     )
 
     # Determine column positions
     if not "group" in column_info.columns or all(pd.isna(column_info["group"])):
         column_info["group"] = ""
-        column_groups = pd.DataFrame({"group": ""})
+        column_groups = pd.DataFrame({"group": [""]})
         plot_column_annotation = False
     else:
         plot_column_annotation = True
 
-    col_pos = calculate_column_positions(
+    column_pos = calculate_column_positions(
         column_info=column_info,
         col_width=col_width,
         col_space=col_space,
         col_bigspace=col_bigspace,
     )
+
+    # just testing somethings
+    plot_funkyrect(data)
+
+    # Process data
+
+    """geom_data_processor = make_data_processor(
+        data=data,
+        column_pos=column_pos,
+        row_pos=row_pos,
+        scale_column=scale_column,
+        palettes=palettes,
+    )"""

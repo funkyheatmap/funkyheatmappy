@@ -43,6 +43,5 @@ def funkyheatmap(
         col_annot_angle,
         removed_entries
     )
-    """
 
-    compose_plot(coordinates, expand)"""
+    #compose_plot(positions, expand)
