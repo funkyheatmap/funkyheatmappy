@@ -1,6 +1,25 @@
-def calculate_row_positions(row_info, row_height, row_space, row_bigspace):
-    row_pos = row_info
-    row_pos["group_i"] = row_info.groupby("group").ngroup()
-    row_pos["color_background"] = row_info["group_i"] % 2
+import pandas as pd
+import numpy as np
+
+
+def calculate_row_positions(row_info, row_height, row_space):
+    row_pos = pd.DataFrame(row_info)
+    row_pos["group_i"] = row_pos.groupby("group").cumcount()
+    row_pos["row_i"] = range(len(row_pos))
+    row_pos["color_background"] = row_pos["group_i"] % 2 == 1
+    row_pos["do_spacing"] = row_pos.groupby("group").ngroup().diff() != 0
+    row_pos["do_spacing"].iloc[0] = False
+    row_pos["ysep"] = [
+        row_height + 2 * row_space if spacing else row_space
+        for spacing in row_pos["do_spacing"]
+    ]
+    row_pos["y"] = -1 * (
+        np.add(
+            (row_pos["row_i"] + 1).tolist() * row_height,
+            row_pos["ysep"].cumsum().tolist(),
+        )
+    )
+    row_pos["ymin"] = row_pos["y"] - row_height / 2
+    row_pos["ymax"] = row_pos["y"] + row_height / 2
 
     return row_pos
