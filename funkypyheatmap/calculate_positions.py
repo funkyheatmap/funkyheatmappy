@@ -2,7 +2,9 @@ import pandas as pd
 from numpy import nan
 from funkypyheatmap.calculate_row_positions import calculate_row_positions
 from funkypyheatmap.calculate_column_positions import calculate_column_positions
-from funkypyheatmap.plot_funkyrect import plot_funkyrect
+
+# from funkypyheatmap.plot_funkyrect import plot_funkyrect
+from funkypyheatmap.make_data_processor import make_data_processor
 
 
 def calculate_positions(
@@ -46,21 +48,15 @@ def calculate_positions(
         plot_column_annotation = True
 
     column_pos = calculate_column_positions(
-        column_info=column_info,
-        col_width=col_width,
-        col_space=col_space,
-        col_bigspace=col_bigspace,
+        column_info=column_info, col_space=col_space, col_bigspace=col_bigspace
     )
 
     # just testing somethings
-    plot_funkyrect(data)
+    # plot_funkyrect(data)
 
     # Process data
 
-    """geom_data_processor = make_data_processor(
-        data=data,
-        column_pos=column_pos,
-        row_pos=row_pos,
-        scale_column=scale_column,
-        palettes=palettes,
-    )"""
+    geom_data_processor = make_data_processor(
+        data=data, column_pos=column_pos, row_pos=row_pos, scale_column=scale_column, palette_list=palettes
+    )
+    print("h")

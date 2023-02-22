@@ -6,16 +6,17 @@ from pandas.api.types import is_string_dtype, is_numeric_dtype, is_dict_like
 
 def verify_column_info(data, column_info=None):
     if column_info is None:
-        column_info = pd.DataFrame(data.columns, columns=["id"])
+        column_info = pd.DataFrame(index=data.columns)
+        column_info.index.names = ["id"]
     assert isinstance(
         column_info, pd.DataFrame
     ), "column_info must be a pandas dataframe"
-    assert "id" in column_info.columns, "column_info must have a column named 'id'"
+    # assert "id" in column_info.columns, "column_info must have a column named 'id'"
     assert all(
-        column_info["id"].isin(data.columns)
+        column_info.index.isin(data.columns)
     ), "column_info must have the same ids as data"
     assert all(
-        isinstance(s, str) for s in column_info["id"]
+        isinstance(s, str) for s in column_info.index
     ), "column_info must have string ids"
 
     # checking options
@@ -24,7 +25,7 @@ def verify_column_info(data, column_info=None):
 
     # checking name
     if "name" not in column_info.columns:
-        column_info["name"] = [re.sub("_", "", s).title() for s in column_info["id"]]
+        column_info["name"] = [re.sub("_", "", s).title() for s in column_info.index]
     assert all(
         isinstance(s, str) for s in column_info["name"]
     ), "column_info must have string names"
@@ -34,11 +35,11 @@ def verify_column_info(data, column_info=None):
         # column_info["geom"] = np.nan
         for col in data.columns:
             if is_numeric_dtype(data[col]):
-                column_info.loc[column_info["id"] == col, "geom"] = "funkyrect"
+                column_info.loc[column_info.index == col, "geom"] = "funkyrect"
             elif is_string_dtype(data[col]):
-                column_info.loc[column_info["id"] == col, "geom"] = "text"
+                column_info.loc[column_info.index == col, "geom"] = "text"
             elif is_dict_like(data[col]):
-                column_info.loc[column_info["id"] == col, "geom"] = "pie"
+                column_info.loc[column_info.index == col, "geom"] = "pie"
     assert all(
         column_info["geom"].isin(["funkyrect", "text", "pie", "circle", "rect", "bar"])
     ), "column_info must have a valid geom"

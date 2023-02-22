@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 
 
-def calculate_column_positions(column_info, col_width, col_space, col_bigspace):
+def calculate_column_positions(column_info, col_space, col_bigspace):
     column_pos = pd.DataFrame(column_info)
     column_pos["do_spacing"] = pd.get_dummies(column_info["group"]).diff() != 0
     column_pos["do_spacing"].iloc[0] = False
     column_pos["xsep"] = np.nan
-    column_pos[column_pos["overlay"]]["xsep"] = pd.Series([0]).append(
-        -1 * column_pos["width"][:-1]
+    column_pos[column_pos["overlay"]]["xsep"] = pd.concat(
+        [pd.Series([0]), -1 * column_pos["width"][:-1]]
     )
     column_pos[column_pos["do_spacing"]]["xsep"] = col_bigspace
     column_pos["xsep"] = column_pos["xsep"].fillna(col_space)

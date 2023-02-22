@@ -23,13 +23,12 @@ def verify_palettes(data, column_info, palettes=None):
     rotation_counter = {"numerical": 0, "categorical": 0}
     for palette_id in col_info_palettes:
         if palette_id not in palettes.keys():
-            columns = column_info.loc[column_info["palette"] == palette_id, :].iloc[
-                0, :
-            ]
+            columns_tmp = column_info.loc[column_info["palette"] == palette_id, :]
+            columns = columns_tmp.iloc[0, :]
 
             if columns["geom"] == "pie":
                 palette_type = "categorical"
-            elif is_numeric_dtype(data[columns["id"]]):
+            elif is_numeric_dtype(data[columns_tmp.index[0]]):
                 palette_type = "numerical"
             else:
                 palette_type = "categorical"
