@@ -5,7 +5,7 @@ from .verify_column_groups import verify_column_groups
 from .verify_row_groups import verify_row_groups
 from .verify_palettes import verify_palettes
 from .calculate_positions import calculate_positions
-
+from .compose_plot import compose_plot
 
 def funkyheatmap(
     data,
@@ -44,4 +44,4 @@ def funkyheatmap(
         removed_entries
     )
 
-    #compose_plot(positions, expand)
+    compose_plot(positions, expand)

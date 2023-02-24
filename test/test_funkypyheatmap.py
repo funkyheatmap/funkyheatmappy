@@ -12,14 +12,6 @@ def mtcars():
 
 
 class TestFunkypyheatmap(object):
-    @classmethod
-    def setup_class(cls):
-        pass
-
-    def test_something(self, mtcars):
+    def test_mtcars(self, mtcars):
         mtcars = mtcars.rename(columns={"Unnamed: 0": "id"})
         funkypyheatmap.funkyheatmap(mtcars)
-
-    @classmethod
-    def teardown_class(cls):
-        pass

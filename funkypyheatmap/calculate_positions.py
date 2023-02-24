@@ -122,17 +122,11 @@ def calculate_positions(
 
     barguides_data = data_processor("bar", barguides_fun)
 
+    segment_data = barguides_data.assign(colour="black", size=0.5, linetype="dashed")
+
     def text_fun(dat):
         dat = dat.assign(color="black")
         return dat
-
-    """segment_data = pd.concat(
-        [
-            segment_data,
-            barguides_data.assign(colour="black", size=0.5, linetype="dashed"),
-        ],
-        ignore_index=True,
-    )"""
 
     text_data = data_processor("text", text_fun)
 
@@ -162,15 +156,108 @@ def calculate_positions(
 
     pie_data = data_processor("pie", pie_fun)
 
-    return (
-        row_pos,
-        column_pos,
-        # segment_data,
-        rect_data,
-        circle_data,
-        funkyrect_data,
-        pie_data,
-        text_data,
-        # bounds,
-        # viz_params,
+    # Add Annotations
+    if plot_row_annotation:
+        row_annotation = (
+            row_groups.melt(id_vars="group", var_name="level", value_name="name")
+            .merge(column_pos[["group", "xmin", "xmax"]], how="left", on="group")
+            .groupby("name")
+        )
+        # to add
+
+    if plot_column_annotation:
+        col_join = column_groups.melt(
+            id_vars=["group", "palette"], var_name="level", value_name="name"
+        ).merge(column_pos[["group", "xmin", "xmax"]], how="left", on="group")
+        text_pct = 0.9
+        # to add
+
+    # Add column names
+    df = column_pos[column_pos["name"] != ""]
+    if df.shape[0] > 0:
+        df_column_segments = pd.DataFrame(
+            {"x": df["x"], "xend": df["x"], "y": -0.3, "yend": -0.1, "size": 0.5}
+        )
+        segment_data = segment_data.append(df_column_segments)
+        df_column_text = pd.DataFrame(
+            {
+                "xmin": df["xmin"],
+                "xmax": df["xmax"],
+                "ymin": 0,
+                "ymax": col_annot_offset,
+                "angle": col_annot_angle,
+                "vjust": 0,
+                "hjust": 0,
+                "label_value": df["name"],
+            }
+        )
+        text_data = text_data.append(df_column_text)
+
+    # Determine plotting window
+
+    """minimum_x = min(
+        [
+            column_pos["xmin"],
+            segment_data["x"],
+            segment_data["xend"],
+            rect_data["xmin"],
+            circle_data["x"] - circle_data["r"],
+            funkyrect_data["x"] - funkyrect_data["r"],
+            pie_data["xmin"],
+            text_data["xmin"],
+        ]
     )
+
+    maximum_x = max(
+        [
+            column_pos["xmax"],
+            segment_data["x"],
+            segment_data["xend"],
+            rect_data["xmax"],
+            circle_data["x"] + circle_data["r"],
+            funkyrect_data["x"] + funkyrect_data["r"],
+            pie_data["xmax"],
+            text_data["xmax"],
+        ]
+    )
+
+    minimum_y = min(
+        [
+            row_pos["ymin"],
+            segment_data["y"],
+            segment_data["yend"],
+            rect_data["ymin"],
+            circle_data["y"] - circle_data["r"],
+            funkyrect_data["y"] - funkyrect_data["r"],
+            pie_data["ymin"],
+            text_data["ymin"],
+        ]
+    )
+
+    maximum_y = max(
+        [
+            row_pos["ymax"],
+            segment_data["y"],
+            segment_data["yend"],
+            rect_data["ymax"],
+            circle_data["y"] + circle_data["r"],
+            funkyrect_data["y"] + funkyrect_data["r"],
+            pie_data["ymax"],
+            text_data["ymax"],
+        ]
+    )
+
+    # Create legends
+    legend_pos = minimum_y"""
+    return {
+        "row_pos": row_pos,
+        "column_pos": column_pos,
+        "segment_data": segment_data,
+        "rect_data": rect_data,
+        "circle_data": circle_data,
+        "funkyrect_data": funkyrect_data,
+        "pie_data": pie_data,
+        "text_data": text_data,
+        # "bounds": bounds,
+        "viz_params": row_space,
+    }
