@@ -90,6 +90,7 @@ def calculate_positions(
             result = pd.concat([result, column_funkyrect])
         return result
 
+    # plot_funkyrect(data)
     funkyrect_data = data_processor("funkyrect", funkyrect_fun)
 
     def bar_fun(dat):
@@ -249,6 +250,24 @@ def calculate_positions(
 
     # Create legends
     legend_pos = minimum_y"""
+
+    # Simplify certain geoms
+    if funkyrect_data.shape[0] > 0:
+        circle_data = circle_data.append(
+            funkyrect_data[
+                ~np.isnan(funkyrect_data["start"])
+                & (funkyrect_data["start"] < 1e-10)
+                & (2 * np.pi - 1e-10 < funkyrect_data["end"])
+            ][["x", "y", "r", "colour"]]
+        )
+        funkyrect_data = funkyrect_data[
+            ~(
+                ~np.isnan(funkyrect_data["start"])
+                & (funkyrect_data["start"] < 1e-10)
+                & (2 * np.pi - 1e-10 < funkyrect_data["end"])
+            )
+        ]
+
     return {
         "row_pos": row_pos,
         "column_pos": column_pos,
@@ -261,3 +280,4 @@ def calculate_positions(
         # "bounds": bounds,
         "viz_params": row_space,
     }
+

@@ -3,7 +3,7 @@ import numpy as np
 
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
-from matplotlib.patches import Rectangle, Circle
+from matplotlib.patches import Rectangle, Circle, FancyBboxPatch
 
 
 def compose_plot(positions, expand):
@@ -57,13 +57,26 @@ def compose_plot(positions, expand):
     if positions["circle_data"].shape[0] > 0:
         for _, row in positions["circle_data"].iterrows():
             circle = Circle(
-                xy=(row["x0"], row["y0"]), radius=row["r"], color=row["colour"]
+                xy=(row["x"], row["y"]),
+                radius=row["r"],
+                ec="k",
+                lw=0.5,  # , color=row["colour"]
             )
             ax.add_patch(circle)
 
     # Plot funky rectangles
     if positions["funkyrect_data"].shape[0] > 0:
-        pass
+        for _, row in positions["funkyrect_data"].iterrows():
+            funkyrect = FancyBboxPatch(
+                (row["x"] - row["w"] / 2, row["y"] - row["h"] / 2),
+                row["w"],
+                row["h"],
+                boxstyle=f"round, pad = 0, rounding_size={row['corner_size']}",
+                # fc=row["colour"],
+                ec="k",
+                lw=0.5,
+            )
+            ax.add_patch(funkyrect)
 
     # Plot pies
     if positions["pie_data"].shape[0] > 0:
@@ -74,7 +87,7 @@ def compose_plot(positions, expand):
             positions["text_data"],
             hjust=0.5,
             vjust=0.5,
-            size=4,
+            size=7,
             fontface="plain",
             colour="black",
             lineheight=1,
@@ -163,8 +176,8 @@ def compose_plot(positions, expand):
                 size=row["size"],
                 color=row["colour"],
                 rotation=row["angle"],
-                ha="center",
-                va="center",
+                ha="left",
+                va="bottom",
             )
 
     ax.axis("equal")
