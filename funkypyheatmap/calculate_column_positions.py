@@ -3,7 +3,7 @@ import numpy as np
 
 
 def calculate_column_positions(column_info, col_space, col_bigspace):
-    column_pos = pd.DataFrame(column_info)
+    column_pos = pd.DataFrame(column_info).copy()
     column_pos["do_spacing"] = pd.get_dummies(column_info["group"]).diff() != 0
     column_pos["do_spacing"].iloc[0] = False
     column_pos["xsep"] = np.nan

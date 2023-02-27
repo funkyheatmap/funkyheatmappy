@@ -21,7 +21,7 @@ def compose_plot(positions, expand):
                     row["ymin"] - (positions["viz_params"] / 2),
                 ),
                 width=np.max(positions["column_pos"]["xmax"]) + 0.25,
-                height=row["height"] + positions["viz_params"] / 2,
+                height=row["height"],
                 color="#DDDDDD",
                 zorder=0,
             )
@@ -59,8 +59,9 @@ def compose_plot(positions, expand):
             circle = Circle(
                 xy=(row["x"], row["y"]),
                 radius=row["r"],
-                ec="k",
-                lw=0.5,  # , color=row["colour"]
+                ec="black",
+                lw=0.5,
+                fc=row["colour"],
             )
             ax.add_patch(circle)
 
@@ -72,8 +73,8 @@ def compose_plot(positions, expand):
                 row["w"],
                 row["h"],
                 boxstyle=f"round, pad = 0, rounding_size={row['corner_size']}",
-                # fc=row["colour"],
-                ec="k",
+                fc=row["colour"],
+                ec="black",
                 lw=0.5,
             )
             ax.add_patch(funkyrect)
@@ -85,8 +86,8 @@ def compose_plot(positions, expand):
     if positions["text_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["text_data"],
-            hjust=0.5,
-            vjust=0.5,
+            ha=0.5,
+            va=0.5,
             size=7,
             fontface="plain",
             colour="black",
@@ -104,9 +105,7 @@ def compose_plot(positions, expand):
                     np.multiply(
                         (
                             [
-                                1 - df["hjust"].iloc[i]
-                                if c < 0
-                                else df["hjust"].iloc[i]
+                                1 - df["ha"].iloc[i] if c < 0 else df["ha"].iloc[i]
                                 for i, c in enumerate(df["cosa"])
                             ]
                         ),
@@ -117,9 +116,9 @@ def compose_plot(positions, expand):
                     np.multiply(
                         (
                             [
-                                np.subtract(1, df["vjust"].iloc[i])
+                                np.subtract(1, df["va"].iloc[i])
                                 if s > 0
-                                else df["vjust"].iloc[i]
+                                else df["va"].iloc[i]
                                 for i, s in enumerate(df["sina"])
                             ]
                         ),
@@ -132,9 +131,9 @@ def compose_plot(positions, expand):
                     np.multiply(
                         (
                             [
-                                np.subtract(1, df["hjust"].iloc[i])
+                                np.subtract(1, df["ha"].iloc[i])
                                 if s < 0
-                                else df["hjust"].iloc[i]
+                                else df["ha"].iloc[i]
                                 for i, s in enumerate(df["sina"])
                             ]
                         ),
@@ -145,9 +144,9 @@ def compose_plot(positions, expand):
                     np.multiply(
                         (
                             [
-                                np.subtract(1, df["vjust"].iloc[i])
+                                np.subtract(1, df["va"].iloc[i])
                                 if c < 0
-                                else df["vjust"].iloc[i]
+                                else df["va"].iloc[i]
                                 for i, c in enumerate(df["cosa"])
                             ]
                         ),
@@ -169,6 +168,18 @@ def compose_plot(positions, expand):
 
         df = df[df["label_value"] != ""]
         for _, row in df.iterrows():
+            if row["ha"] == 0.5:
+                ha = "center"
+            elif row["ha"] == 0:
+                ha = "left"
+            else:
+                ha = "right"
+            if row["va"] == 0.5:
+                va = "center"
+            elif row["va"] == 0:
+                va = "bottom"
+            else:
+                va = "top"
             ax.text(
                 x=row["x"],
                 y=row["y"],
@@ -176,11 +187,10 @@ def compose_plot(positions, expand):
                 size=row["size"],
                 color=row["colour"],
                 rotation=row["angle"],
-                ha="left",
-                va="bottom",
+                ha=ha,
+                va=va,
             )
 
     ax.axis("equal")
     plt.axis("off")
     plt.show()
-    print("hello")

@@ -1,9 +1,54 @@
+import matplotlib
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
+import matplotlib.cm as cm
+
+
+color_dict = dict(
+    zip(
+        ["Blues", "Reds", "YlOrBr", "Greens", "Greys", "Set3", "Set1", "Set2", "Dark2"],
+        [
+            cm.Blues_r,
+            cm.Reds_r,
+            cm.YlOrBr_r,
+            cm.Greens_r,
+            cm.Greys_r,
+            cm.Set3,
+            cm.Set1,
+            cm.Set2,
+            cm.Dark2,
+        ],
+    )
+)
+
+for cmap in color_dict.keys():
+    if cmap in ["Blues", "Reds", "YlOrBr", "Greens", "Greys"]:
+        vmax = 101
+    elif cmap == "Set3":
+        vmax = 12
+    elif cmap == "Set1":
+        vmax = 9
+    else:
+        vmax = 8
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=vmax, clip=True)
+    mapper = cm.ScalarMappable(norm=norm, cmap=color_dict[cmap])
+    colors = [mapper.to_rgba(i) for i in range(0, vmax)]
+    color_dict[cmap] = colors
 
 default_palettes = {
-    "numerical": ["Blues", "Reds", "YlOrBr", "Greens", "Greys"],
-    "categorical": ["Set1", "Set2", "Set3", "Dark2"],
+    "numerical": {
+        "Blues": color_dict["Blues"],
+        "Reds": color_dict["Reds"],
+        "YlOrBr": color_dict["YlOrBr"],
+        "Greens": color_dict["Greens"],
+        "Greys": color_dict["Greys"],
+    },
+    "categorical": {
+        "Set1": color_dict["Set1"],
+        "Set2": color_dict["Set2"],
+        "Set3": color_dict["Set3"],
+        "Dark2": color_dict["Dark2"],
+    },
 }
 
 
@@ -34,7 +79,7 @@ def verify_palettes(data, column_info, palettes=None):
                 palette_type = "categorical"
 
             counter = rotation_counter[palette_type]
-            palette_name = default_palettes[palette_type][counter]
+            palette_name = list(default_palettes[palette_type].keys())[counter]
 
             # increment counter
             counter += 1
@@ -46,14 +91,15 @@ def verify_palettes(data, column_info, palettes=None):
         assert all(
             isinstance(palette, str) for palette in palettes.values()
         ), f"palettes must be strings"
-        """
+
         pal_value = palettes[palette_id]
-        if len(pal_value) == 1:
-            if pal_value in default_palettes["numerical"]:
+
+        if isinstance(pal_value, str):
+            if pal_value in list(default_palettes["numerical"].keys()):
                 pal_value = default_palettes["numerical"][pal_value]
-            elif pal_value in default_palettes["categorical"]:
+            elif pal_value in list(default_palettes["categorical"].keys()):
                 pal_value = default_palettes["categorical"][pal_value]
         palettes[palette_id] = pal_value
-        """
+
     return palettes
 

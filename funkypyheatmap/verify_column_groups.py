@@ -23,8 +23,9 @@ def verify_column_groups(column_info, column_groups=None):
     assert all(
         isinstance(s, str) for s in column_groups["group"]
     ), "column_groups must have string groups"
-    assert all(pd.isna(column_info["group"])) or all(
-        column_info["group"].isin(column_groups["group"])
+    assert all(
+        (pd.isna(column_info["group"]))
+        | (column_info["group"].isin(column_groups["group"]))
     ), "column_info must have the same groups as column_groups"
 
     if not all(column_groups["group"].isin(column_info["group"])):
@@ -41,9 +42,7 @@ def verify_column_groups(column_info, column_groups=None):
     ), "column_groups must have string palettes"
 
     # checking other columns
-    column_group_colnames = set(column_groups.columns).difference(
-        set("group", "palette")
-    )
+    column_group_colnames = set(column_groups.columns).difference({"group", "palette"})
 
     if len(column_group_colnames) == 0:
         column_groups["level1"] = str(column_groups["group"]).title()

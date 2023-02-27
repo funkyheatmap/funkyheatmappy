@@ -5,7 +5,6 @@ from funkypyheatmap.add_column_if_missing import add_column_if_missing
 from funkypyheatmap.calculate_row_positions import calculate_row_positions
 from funkypyheatmap.calculate_column_positions import calculate_column_positions
 
-# from funkypyheatmap.plot_funkyrect import plot_funkyrect
 from funkypyheatmap.make_data_processor import make_data_processor
 
 
@@ -94,10 +93,10 @@ def calculate_positions(
     funkyrect_data = data_processor("funkyrect", funkyrect_fun)
 
     def bar_fun(dat):
-        dat = add_column_if_missing(dat, hjust=0)
+        dat = add_column_if_missing(dat, ha=0)
         dat = dat.assign(
-            xmin=dat["xmin"] + (1 - dat["value"]) * dat["xwidth"] * data["hjust"],
-            xmax=dat["xmax"] + (1 - dat["value"]) * dat["xwidth"] * (1 - data["hjust"]),
+            xmin=dat["xmin"] + (1 - dat["value"]) * dat["xwidth"] * data["ha"],
+            xmax=dat["xmax"] + (1 - dat["value"]) * dat["xwidth"] * (1 - data["ha"]),
         )
         return dat
 
@@ -187,8 +186,8 @@ def calculate_positions(
                 "ymin": 0,
                 "ymax": col_annot_offset,
                 "angle": col_annot_angle,
-                "vjust": 0,
-                "hjust": 0,
+                "va": 0,
+                "ha": 0,
                 "label_value": df["name"],
             }
         )

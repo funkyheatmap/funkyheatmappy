@@ -51,7 +51,7 @@ def verify_column_info(data, column_info=None):
     if "group" not in column_info.columns:
         column_info["group"] = np.nan
     assert all(
-        isinstance(s, str) or np.isnan(s) for s in column_info["group"]
+        isinstance(s, str) or pd.isna(s) for s in column_info["group"]
     ), "column_info must have string groups"
 
     # checking palette

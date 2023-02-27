@@ -19,7 +19,7 @@ def verify_row_groups(row_info, row_groups=None):
     ), "row_info must have the same groups as row_groups"
 
     # checking other columns
-    row_group_colnames = set(row_groups.columns).difference(set("group", "palette"))
+    row_group_colnames = set(row_groups.columns).difference({"group", "palette"})
 
     if len(row_group_colnames) == 0:
         row_groups["level1"] = str(row_groups["group"]).title()

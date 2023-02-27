@@ -3,7 +3,7 @@ import numpy as np
 
 
 def calculate_row_positions(row_info, row_height, row_space):
-    row_pos = pd.DataFrame(row_info)
+    row_pos = pd.DataFrame(row_info).copy()
     row_pos["group_i"] = row_pos.groupby("group").cumcount()
     row_pos["row_i"] = range(len(row_pos))
     row_pos["color_background"] = row_pos["group_i"] % 2 == 0

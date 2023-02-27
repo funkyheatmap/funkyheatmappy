@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
+from funkypyheatmap.score_to_funkyrectangle import score_to_funkyrectangle
 
 
 def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
@@ -16,10 +17,11 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
         result = pd.DataFrame()
         for index, row in column_sels.iterrows():
             row["label"] = (
-                index if row["geom"] == "text" and np.isnan(row["label"]) else row["label"]
+                index
+                if row["geom"] == "text" and np.isnan(row["label"])
+                else row["label"]
             )
 
-            # row_sel = pd.DataFrame(row_pos)
             row_sel = row_pos[["ysep", "y", "ymin", "ymax"]]
             row_sel.index.names = ["row_id"]
 
@@ -38,7 +40,9 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                     data.assign(row_id=data["id"])
                     .filter(["row_id", labelcolumn_sel["label"]])
                     .melt(
-                        id_vars="row_id", var_name="label_column", value_name="label_value"
+                        id_vars="row_id",
+                        var_name="label_column",
+                        value_name="label_value",
                     )
                 )
                 labelcolumn_to_merge = pd.DataFrame(
@@ -51,13 +55,17 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                     labelcolumn_to_merge, on="label_column", how="left"
                 ).drop(columns="label_column")
                 data_sel = data_sel.reset_index(drop=True).merge(
-                    label_sel.reset_index(drop=True), on=["row_id", "column_id"], how="left"
+                    label_sel.reset_index(drop=True),
+                    on=["row_id", "column_id"],
+                    how="left",
                 )
                 data_sel.index = data_sel["row_id"]
                 data_sel.index.names = ["row_id"]
             dat = data_sel.join(row_sel)
             dat = dat.merge(
-                pd.DataFrame(pd.concat([pd.Series({"column_id": index}), row])).transpose(),
+                pd.DataFrame(
+                    pd.concat([pd.Series({"column_id": index}), row])
+                ).transpose(),
                 how="left",
                 on="column_id",
             )
@@ -70,7 +78,6 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
             dat = fun(dat)
 
             # determine colours
-
             if pd.notna(row["palette"]):
                 palette_sel = palette_list[row["palette"]]
                 if is_string_dtype(dat["value"]):
@@ -78,15 +85,16 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                 elif is_numeric_dtype(dat["value"]):
                     dat["col_value"] = (dat["value"] * (len(palette_sel) - 1)).round(
                         decimals=0
-                    ) + 1
+                    )
                 else:
                     dat["col_value"] = np.nan
 
-                dat["colour"] = palette_sel
-                """[
-                "#444444FF" if np.isnan(col_val) else palette_sel[col_val] for col_val in dat["col_value"]
-                ]"""
-                dat = dat.drop(["col_value", "value"], axis=1)
+                dat = dat.assign(
+                    colour=[
+                        "#444444FF" if np.isnan(col_val) else palette_sel[int(col_val)]
+                        for col_val in dat["col_value"]
+                    ]
+                ).drop(["col_value", "value"], axis=1)
             result = pd.concat([result, dat])
         return result
 
