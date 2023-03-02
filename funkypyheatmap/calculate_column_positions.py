@@ -3,8 +3,12 @@ import numpy as np
 
 
 def calculate_column_positions(column_info, col_space, col_bigspace):
-    column_pos = pd.DataFrame(column_info).copy()
-    column_pos["do_spacing"] = pd.get_dummies(column_info["group"]).diff() != 0
+    column_pos = pd.DataFrame(column_info)
+    do_spacing = column_info.groupby("group").ngroup().diff(periods=-1)[:-1]
+    do_spacing[pd.isna(do_spacing)] = 0
+    column_pos = column_pos.assign(
+        do_spacing=pd.concat([pd.Series(False), do_spacing != 0]).tolist()
+    )
     column_pos["do_spacing"].iloc[0] = False
     column_pos["xsep"] = np.nan
     column_pos[column_pos["overlay"]]["xsep"] = pd.concat(

@@ -4,8 +4,9 @@ from funkypyheatmap.score_to_funkyrectangle import score_to_funkyrectangle
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
 from funkypyheatmap.calculate_row_positions import calculate_row_positions
 from funkypyheatmap.calculate_column_positions import calculate_column_positions
-
+from funkypyheatmap.verify_palettes import default_palettes
 from funkypyheatmap.make_data_processor import make_data_processor
+from itertools import product
 
 
 def calculate_positions(
@@ -75,54 +76,52 @@ def calculate_positions(
     rect_data = data_processor("rect", rect_fun)
 
     def funkyrect_fun(dat):
-        dat = dat[["xmin", "xmax", "ymin", "ymax", "value"]]
-        result = pd.DataFrame()
-        for _, row in dat.iterrows():
-            column_funkyrect = score_to_funkyrectangle(
-                xmin=row["xmin"],
-                xmax=row["xmax"],
-                ymin=row["ymin"],
-                ymax=row["ymax"],
-                value=row["value"],
-                midpoint=0.8,
-            )
-            result = pd.concat([result, column_funkyrect])
+        result = pd.concat(
+            [
+                score_to_funkyrectangle(
+                    xmin=row["xmin"],
+                    xmax=row["xmax"],
+                    ymin=row["ymin"],
+                    ymax=row["ymax"],
+                    value=row["value"],
+                    midpoint=0.8,
+                )
+                for _, row in dat[["xmin", "xmax", "ymin", "ymax", "value"]].iterrows()
+            ]
+        )
         return result
 
-    # plot_funkyrect(data)
     funkyrect_data = data_processor("funkyrect", funkyrect_fun)
 
     def bar_fun(dat):
-        dat = add_column_if_missing(dat, ha=0)
+        dat = add_column_if_missing(dat, hjust=0)
         dat = dat.assign(
-            xmin=dat["xmin"] + (1 - dat["value"]) * dat["xwidth"] * data["ha"],
-            xmax=dat["xmax"] + (1 - dat["value"]) * dat["xwidth"] * (1 - data["ha"]),
+            xmin=dat["xmin"] + (1 - dat["value"]) * dat["xwidth"] * dat["hjust"],
+            xmax=dat["xmax"] - (1 - dat["value"]) * dat["xwidth"] * (1 - dat["hjust"]),
         )
         return dat
 
     bar_data = data_processor("bar", bar_fun)
 
-    def extract_columns(dat, col_id):
-        grouped = dat.groupby(col_id).nth(0).reset_index()
-        selected_cols = pd.melt(
-            grouped,
-            id_vars=[col_id],
-            value_vars=["xmin", "xmax"],
-            var_name="col",
-            value_name="x",
-        )
-        selected_cols["xend"] = selected_cols["x"]
-        return selected_cols[["x", "xend"]]
-
     def barguides_fun(dat):
-        dat = pd.concat(
-            [extract_columns(dat, "column_id"), row_pos[["ymin", "ymax"]]], axis=1
-        ).assign(palette=np.nan, value=np.nan)
-        return dat
+        dat = ((dat.groupby("column_id").first())[["xmin", "xmax"]]).melt(
+            var_name="col", value_name="x"
+        )
+        dat = dat.assign(xend=dat["x"])[["x", "xend"]]
+        cols_to_add = pd.DataFrame({"y": row_pos["ymin"], "yend": row_pos["ymax"]})
+        result = (
+            pd.merge(dat.assign(key=1), cols_to_add.assign(key=1), on="key")
+            .drop("key", axis=1)
+            .sort_values(["x", "xend"])
+            .reset_index(drop=True)
+            .drop_duplicates()
+            .assign(palette=np.nan, value=np.nan)
+        )
+        return result
 
-    barguides_data = data_processor("bar", barguides_fun)
-
-    segment_data = barguides_data.assign(colour="black", size=0.5, linetype="dashed")
+    segment_data = data_processor("bar", barguides_fun).assign(
+        colour="black", size=0.5, linestyle="dashed"
+    )
 
     def text_fun(dat):
         dat = dat.assign(color="black")
@@ -178,7 +177,7 @@ def calculate_positions(
         df_column_segments = pd.DataFrame(
             {"x": df["x"], "xend": df["x"], "y": -0.3, "yend": -0.1, "size": 0.5}
         )
-        segment_data = segment_data.append(df_column_segments)
+        segment_data = pd.concat([segment_data, df_column_segments])
         df_column_text = pd.DataFrame(
             {
                 "xmin": df["xmin"],
@@ -191,73 +190,224 @@ def calculate_positions(
                 "label_value": df["name"],
             }
         )
-        text_data = text_data.append(df_column_text)
+        text_data = pd.concat([text_data, df_column_text])
 
     # Determine plotting window
 
-    """minimum_x = min(
+    minimum_x = min(
         [
-            column_pos["xmin"],
-            segment_data["x"],
-            segment_data["xend"],
-            rect_data["xmin"],
-            circle_data["x"] - circle_data["r"],
-            funkyrect_data["x"] - funkyrect_data["r"],
-            pie_data["xmin"],
-            text_data["xmin"],
+            min(lst, default=np.nan)
+            for lst in [
+                column_pos["xmin"],
+                segment_data["x"],
+                segment_data["xend"],
+                rect_data["xmin"],
+                circle_data["x"] - circle_data["r"],
+                funkyrect_data["x"] - funkyrect_data["r"],
+                pie_data["xmin"],
+                text_data["xmin"],
+            ]
         ]
     )
 
     maximum_x = max(
         [
-            column_pos["xmax"],
-            segment_data["x"],
-            segment_data["xend"],
-            rect_data["xmax"],
-            circle_data["x"] + circle_data["r"],
-            funkyrect_data["x"] + funkyrect_data["r"],
-            pie_data["xmax"],
-            text_data["xmax"],
+            max(lst, default=np.nan)
+            for lst in [
+                column_pos["xmax"],
+                segment_data["x"],
+                segment_data["xend"],
+                rect_data["xmax"],
+                circle_data["x"] + circle_data["r"],
+                funkyrect_data["x"] + funkyrect_data["r"],
+                pie_data["xmax"],
+                text_data["xmax"],
+            ]
         ]
     )
 
     minimum_y = min(
         [
-            row_pos["ymin"],
-            segment_data["y"],
-            segment_data["yend"],
-            rect_data["ymin"],
-            circle_data["y"] - circle_data["r"],
-            funkyrect_data["y"] - funkyrect_data["r"],
-            pie_data["ymin"],
-            text_data["ymin"],
+            min(lst, default=np.nan)
+            for lst in [
+                row_pos["ymin"],
+                segment_data["y"],
+                segment_data["yend"],
+                rect_data["ymin"],
+                circle_data["y"] - circle_data["r"],
+                funkyrect_data["y"] - funkyrect_data["r"],
+                pie_data["ymin"],
+                text_data["ymin"],
+            ]
         ]
     )
 
     maximum_y = max(
         [
-            row_pos["ymax"],
-            segment_data["y"],
-            segment_data["yend"],
-            rect_data["ymax"],
-            circle_data["y"] + circle_data["r"],
-            funkyrect_data["y"] + funkyrect_data["r"],
-            pie_data["ymax"],
-            text_data["ymax"],
+            max(lst, default=np.nan)
+            for lst in [
+                row_pos["ymax"],
+                segment_data["y"],
+                segment_data["yend"],
+                rect_data["ymax"],
+                circle_data["y"] + circle_data["r"],
+                funkyrect_data["y"] + funkyrect_data["r"],
+                pie_data["ymax"],
+                text_data["ymax"],
+            ]
         ]
     )
 
     # Create legends
-    legend_pos = minimum_y"""
+    legend_pos = minimum_y
+    if any(column_pos["geom"] == "pie"):
+        rel_cols = (
+            column_pos[column_pos["geom"] == "pie"]
+            .sort_values("x")
+            .groupby("palette")
+            .first()
+        )
+        # make legend
+
+    if any(column_pos["geom"] == "funkyrect"):
+        fr_minimum_x = column_pos[column_pos["geom"] == "funkyrect"]["xmin"].min()
+        fr_legend_size = 1
+        fr_legend_space = 0.2
+        fr_legend_dat1 = pd.DataFrame(
+            {
+                "value": np.append(np.arange(0, 1, 0.1), 1),
+                "xmin": 0,
+                "xmax": col_width * fr_legend_size,
+                "ymin": 0,
+                "ymax": col_width * fr_legend_size,
+            }
+        )
+
+        fr_legend_dat2 = pd.concat(
+            [
+                score_to_funkyrectangle(
+                    xmin=row["xmin"],
+                    xmax=row["xmax"],
+                    ymin=row["ymin"],
+                    ymax=row["ymax"],
+                    value=row["value"],
+                    midpoint=0.8,
+                )
+                for _, row in fr_legend_dat1[
+                    ["xmin", "xmax", "ymin", "ymax", "value"]
+                ].iterrows()
+            ]
+        )
+
+        fr_legend_dat2["minx"] = (
+            fr_legend_dat2.groupby("value").apply(lambda col: min(col["x"] - col["r"]))
+        ).tolist()
+        fr_legend_dat2["maxx"] = (
+            fr_legend_dat2.groupby("value").apply(lambda col: max(col["x"] + col["r"]))
+        ).tolist()
+        fr_legend_dat2["miny"] = (
+            fr_legend_dat2.groupby("value").apply(lambda col: min(col["y"] - col["r"]))
+        ).tolist()
+        fr_legend_dat2["maxy"] = (
+            fr_legend_dat2.groupby("value").apply(lambda col: max(col["y"] + col["r"]))
+        ).tolist()
+        fr_legend_dat2 = fr_legend_dat2.reset_index(drop=True)
+        fr_legend_dat2["w"] = fr_legend_dat2["w"].fillna(
+            fr_legend_dat2["maxx"] - fr_legend_dat2["minx"]
+        )
+        fr_legend_dat2["h"] = fr_legend_dat2["h"].fillna(
+            fr_legend_dat2["maxy"] - fr_legend_dat2["miny"]
+        )
+        xmin = (
+            (fr_legend_dat2["w"] + fr_legend_space).cumsum()
+            - fr_legend_dat2["w"]
+            - fr_legend_space
+        )
+        fr_legend_dat2["xmin"] = fr_minimum_x + xmin - min(xmin)
+        fr_legend_dat2["xmax"] = fr_legend_dat2["xmin"] + fr_legend_dat2["w"]
+        fr_legend_dat2["ymin"] = legend_pos - 2.5
+        fr_legend_dat2["ymax"] = fr_legend_dat2["ymin"] + fr_legend_dat2["h"]
+        fr_legend_dat2["x"] = (fr_legend_dat2["xmin"] + fr_legend_dat2["xmax"]) / 2
+        fr_legend_dat2["y"] = (fr_legend_dat2["ymin"] + fr_legend_dat2["ymax"]) / 2
+        fr_legend_dat2 = fr_legend_dat2[
+            ["x", "y", "value", "xmin", "xmax", "ymin", "ymax", "w", "h", "corner_size"]
+        ]
+        fr_maximum_x = fr_legend_dat2["xmax"].max()
+
+        grey_palette = default_palettes["numerical"]["Greys"]
+        fr_poly_data2 = pd.DataFrame(
+            {
+                "xmin": fr_legend_dat2["x"] - fr_legend_size / 2,
+                "xmax": fr_legend_dat2["x"] + fr_legend_size / 2,
+                "ymin": fr_legend_dat2["y"] - fr_legend_size / 2,
+                "ymax": fr_legend_dat2["y"] + fr_legend_size / 2,
+                "value": fr_legend_dat2["value"],
+            }
+        )
+
+        fr_poly_data2 = pd.concat(
+            [
+                score_to_funkyrectangle(
+                    xmin=row["xmin"],
+                    xmax=row["xmax"],
+                    ymin=row["ymin"],
+                    ymax=row["ymax"],
+                    value=row["value"],
+                    midpoint=0.8,
+                )
+                for _, row in fr_legend_dat2.iterrows()
+            ]
+        )
+        fr_poly_data2["col_value"] = round(
+            fr_poly_data2["value"] * (len(grey_palette) - 1)
+        )
+        fr_poly_data2["colour"] = [
+            "#444444FF" if np.isnan(col_val) else grey_palette[int(col_val)]
+            for col_val in fr_poly_data2["col_value"]
+        ]
+
+        fr_title_data = pd.DataFrame(
+            {
+                "xmin": [fr_minimum_x],
+                "xmax": [fr_maximum_x],
+                "ymin": [legend_pos - 1.5],
+                "ymax": [legend_pos - 0.5],
+                "label_value": ["Score"],
+                "hjust": [0],
+                "vjust": [1],
+                "fontweight": ["bold"],
+            }
+        )
+        fr_value_data = fr_legend_dat2[fr_legend_dat2["value"] % 0.2 == 0]
+        fr_value_data = pd.DataFrame(
+            {
+                "ymin": fr_value_data["ymin"] - 1,
+                "ymax": fr_value_data["ymin"],
+                "xmin": fr_value_data["xmin"],
+                "xmax": fr_value_data["xmax"],
+                "hjust": 0.5,
+                "vjust": 0,
+                "label_value": [
+                    round(val, 0) if val in [0, 1] else round(val, 1)
+                    for val in fr_value_data["value"]
+                ],
+            }
+        )
+
+        text_data = pd.concat([text_data, fr_title_data, fr_value_data])
+        funkyrect_data = pd.concat([funkyrect_data, fr_poly_data2])
 
     # Simplify certain geoms
     if funkyrect_data.shape[0] > 0:
-        circle_data = circle_data.append(
-            funkyrect_data[
-                ~np.isnan(funkyrect_data["start"])
-                & (funkyrect_data["start"] < 1e-10)
-                & (2 * np.pi - 1e-10 < funkyrect_data["end"])
-            ][["x", "y", "r", "colour"]]
+        circle_data = pd.concat(
+            [
+                circle_data,
+                funkyrect_data[
+                    ~np.isnan(funkyrect_data["start"])
+                    & (funkyrect_data["start"] < 1e-10)
+                    & (2 * np.pi - 1e-10 < funkyrect_data["end"])
+                ][["x", "y", "r", "colour"]],
+            ]
         )
         funkyrect_data = funkyrect_data[
             ~(
@@ -267,6 +417,7 @@ def calculate_positions(
             )
         ]
 
+    rect_data = pd.concat([rect_data, bar_data])
     return {
         "row_pos": row_pos,
         "column_pos": column_pos,

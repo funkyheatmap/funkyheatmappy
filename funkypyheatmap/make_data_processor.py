@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
-from funkypyheatmap.score_to_funkyrectangle import score_to_funkyrectangle
 
 
 def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
@@ -13,7 +12,9 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
         column_sels = add_column_if_missing(column_sels, label=np.nan, scale=True)
 
         if column_sels.shape[0] == 0:
-            return pd.DataFrame()
+            return pd.DataFrame(
+                columns=["x", "xmin", "xend", "r", "xmax", "y", "ymin", "ymax"]
+            )
         result = pd.DataFrame()
         for index, row in column_sels.iterrows():
             row["label"] = (

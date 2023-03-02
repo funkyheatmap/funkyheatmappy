@@ -13,7 +13,9 @@ def score_to_funkyrectangle(xmin, xmax, ymin, ymax, value, midpoint=0.5, name=No
         w = xmax - xmin
         h = ymax - ymin
         corner_size = (0.9 - 0.8 * trans) * min(xmax - xmin, ymax - ymin)
-        out = pd.DataFrame({"x": x, "y": y, "w": w, "h": h, "corner_size": corner_size}, index=[0])
+        out = pd.DataFrame(
+            {"x": x, "y": y, "w": w, "h": h, "corner_size": corner_size}, index=[0]
+        )
     else:
         trans = value / midpoint / 2
         start = 0

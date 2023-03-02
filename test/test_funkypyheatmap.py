@@ -4,6 +4,7 @@ Tests for `funkypyheatmap` module.
 import pytest
 from funkypyheatmap import funkypyheatmap
 import pandas as pd
+import numpy as np
 
 
 @pytest.fixture(scope="session")
@@ -15,7 +16,6 @@ def mtcars():
 
 class TestFunkypyheatmap(object):
     def test_mtcars(self, mtcars):
-        mtcars = mtcars.rename(columns={"Unnamed: 0": "id"})
         funkypyheatmap.funkyheatmap(mtcars)
 
     def test_mtcars_extended(self, mtcars):
@@ -65,7 +65,7 @@ class TestFunkypyheatmap(object):
                     "circle",
                 ],
                 "options": [
-                    {"hjust": 0, "width": 6},
+                    {"ha": 0, "width": 6},
                     {"width": 4, "legend": False},
                     {"width": 4, "legend": False},
                     dict(),
@@ -77,6 +77,20 @@ class TestFunkypyheatmap(object):
                     dict(),
                     dict(),
                     dict(),
+                ],
+                "palette": [
+                    np.nan,
+                    "palette1",
+                    "palette2",
+                    "palette1",
+                    "palette1",
+                    "palette1",
+                    "palette1",
+                    "palette2",
+                    "palette2",
+                    "palette2",
+                    "palette2",
+                    "palette2",
                 ],
             }
         )

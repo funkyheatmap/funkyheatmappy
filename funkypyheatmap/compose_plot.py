@@ -30,15 +30,16 @@ def compose_plot(positions, expand):
     # Plot segments
     if positions["segment_data"].shape[0] > 0:
         df = add_column_if_missing(
-            positions["segment_data"], size=0.5, colour="black", linetype="solid"
+            positions["segment_data"], size=0.5, colour="black", linestyle="solid"
         )
         lines = [
             [(row["x"], row["y"]), (row["xend"], row["yend"])]
             for _, row in df.iterrows()
         ]
-        lc = mc.LineCollection(lines, linewidths=df["size"], colors=df["colour"])
-        lc.set_linewidth(0.5)
-        lc.set_zorder(0)
+        lc = mc.LineCollection(
+            lines, linewidths=df["size"], colors=df["colour"], linestyle=df["linestyle"]
+        )
+        lc.set_zorder(1)
         ax.add_collection(lc)
 
     # Plot rectangles
@@ -46,12 +47,24 @@ def compose_plot(positions, expand):
         df = add_column_if_missing(
             positions["rect_data"], border_colour="black", border=True, alpha=1
         )
-        df.assign("border_colour", df["border_colour"] if df["border"] else np.nan)
-        rect = Rectangle(
-            xy=(df["xmin"], df["ymin"]),
-            width=df["xmax"] - df["xmin"],
-            height=df["ymax"] - df["ymin"],
+        df = df.assign(
+            border_colour=[
+                val if df["border"].iloc[i] else np.nan
+                for i, val in enumerate(df["border_colour"])
+            ]
         )
+        for _, row in df.iterrows():
+            rect = Rectangle(
+                xy=(row["xmin"], row["ymin"]),
+                width=row["xmax"] - row["xmin"],
+                height=row["ymax"] - row["ymin"],
+                fc=row["colour"],
+                ec=row["border_colour"],
+                alpha=row["alpha"],
+                lw=0.5,
+                zorder=2,
+            )
+            ax.add_patch(rect)
 
     # Plot circles
     if positions["circle_data"].shape[0] > 0:
@@ -62,6 +75,7 @@ def compose_plot(positions, expand):
                 ec="black",
                 lw=0.5,
                 fc=row["colour"],
+                zorder=2,
             )
             ax.add_patch(circle)
 
@@ -76,6 +90,7 @@ def compose_plot(positions, expand):
                 fc=row["colour"],
                 ec="black",
                 lw=0.5,
+                zorder=2,
             )
             ax.add_patch(funkyrect)
 
@@ -89,10 +104,11 @@ def compose_plot(positions, expand):
             ha=0.5,
             va=0.5,
             size=7,
-            fontface="plain",
+            fontweight="normal",
             colour="black",
-            lineheight=1,
+            linespacing=1,
             angle=0,
+            zorder=3,
         )
         df = df.assign(angle2=np.multiply(np.divide(df["angle"], 360), 2 * np.pi))
         df = df.assign(
@@ -187,6 +203,8 @@ def compose_plot(positions, expand):
                 size=row["size"],
                 color=row["colour"],
                 rotation=row["angle"],
+                fontweight=row["fontweight"],
+                linespacing=row["linespacing"],
                 ha=ha,
                 va=va,
             )

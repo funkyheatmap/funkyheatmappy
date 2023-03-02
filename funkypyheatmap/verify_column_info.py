@@ -21,7 +21,18 @@ def verify_column_info(data, column_info=None):
 
     # checking options
     if "options" in column_info.columns:
-        pass
+        column_info = pd.concat(
+            [
+                column_info,
+                pd.concat(
+                    [
+                        pd.DataFrame([row], index=[column_info.index[i]])
+                        for i, row in enumerate(column_info["options"])
+                    ]
+                ),
+            ],
+            axis=1,
+        ).drop("options", axis=1)
 
     # checking name
     if "name" not in column_info.columns:
@@ -69,8 +80,9 @@ def verify_column_info(data, column_info=None):
         column_info.loc[column_info["geom"] == "text", "width"] = 6
         column_info.loc[column_info["geom"] == "bar", "width"] = 4
     assert all(
-        isinstance(s, int) for s in column_info["width"]
-    ), "column_info must have integer widths"
+        isinstance(s, int) or isinstance(s, float) for s in column_info["width"]
+    ), "column_info must have numerical widths"
+    column_info["width"] = column_info["width"].fillna(1)
 
     # checking overlay
     if "overlay" not in column_info.columns:

@@ -88,9 +88,7 @@ def verify_palettes(data, column_info, palettes=None):
             rotation_counter[palette_type] = counter
 
             palettes[palette_id] = palette_name
-        assert all(
-            isinstance(palette, str) for palette in palettes.values()
-        ), f"palettes must be strings"
+        assert isinstance(palettes[palette_id], str), f"palettes must be strings"
 
         pal_value = palettes[palette_id]
 
