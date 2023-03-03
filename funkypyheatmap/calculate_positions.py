@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import re
 from funkypyheatmap.score_to_funkyrectangle import score_to_funkyrectangle
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
 from funkypyheatmap.calculate_row_positions import calculate_row_positions
@@ -169,8 +170,94 @@ def calculate_positions(
             id_vars=["group", "palette"], var_name="level", value_name="name"
         ).merge(column_pos[["group", "xmin", "xmax"]], how="left", on="group")
         text_pct = 0.9
-        # to add
+        level_heights = pd.DataFrame(
+            col_join.groupby("level").apply(lambda x: max(x["name"].str.count("\n"))),
+            columns=["max_newlines"],
+        )
+        level_heights["height"] = (level_heights["max_newlines"] + 1) * text_pct + (
+            1 - text_pct
+        )
+        level_heights["levelmatch"] = pd.Series(
+            [
+                column_groups.columns.tolist().index(x)
+                for x in column_groups.columns
+                if x in level_heights.index
+            ],
+            index=level_heights.index,
+            name="level",
+        )
+        level_heights = level_heights.sort_values(["levelmatch"])
+        level_heights["ysep"] = row_space
+        level_heights["ymax"] = (
+            col_annot_offset
+            + (level_heights["height"] + level_heights["ysep"]).cumsum()
+            - level_heights["ysep"]
+        )
+        level_heights["ymin"] = level_heights["ymax"] - level_heights["height"]
+        level_heights["y"] = (level_heights["ymin"] + level_heights["ymax"]) / 2
 
+        palette_mids = {
+            x: palettes[x][round(len(palettes[x]) / 2)] for x in palettes.keys()
+        }
+
+        max_newlines = (
+            col_join.groupby("level")
+            .apply(lambda x: x["name"].str.count("\n"))
+            .transpose()
+        )
+        max_newlines.columns = ["max_newlines"]
+        column_annotation = pd.concat(
+            [col_join.reset_index(drop=True), max_newlines], axis=1
+        )
+        """column_annotation.groupby(["level", "name", "palette"]).apply(
+            lambda x: min(x["xmin"])
+        )
+        column_annotation = (
+            column_annotation.groupby(["level", "name", "palette"])
+            .agg(xmin=("xmin", "min"), xmax=("xmax", "max"), x=("xmin", "mean"))
+            .reset_index()
+        )"""
+        column_annotation = column_annotation[
+            column_annotation["levelmatch"] == 1
+        ].sort_values("x")
+
+        rect_data = pd.concat(
+            [
+                rect_data,
+                pd.DataFrame(
+                    {
+                        "xmin": column_annotation["xmin"],
+                        "xmax": column_annotation["xmax"],
+                        "ymin": column_annotation["ymin"],
+                        "ymax": column_annotation["ymax"],
+                        "colour": column_annotation["colour"],
+                        "alpha": [
+                            1 if lm == 1 else 0.25
+                            for lm in column_annotation["levelmatch"]
+                        ],
+                        "border": False,
+                    }
+                ),
+            ]
+        )
+        text_data = pd.concat(
+            [
+                text_data,
+                pd.DataFrame(
+                    {
+                        "xmin": column_annotation["xmin"] + col_space,
+                        "xmax": column_annotation["xmax"] - col_space,
+                        "ymin": column_annotation["ymin"],
+                        "ymax": column_annotation["ymax"],
+                        "va": 0.5,
+                        "ha": 0,
+                        "fontface": "bold",
+                        "colour": "white",
+                        "label_value": column_annotation["name"],
+                    }
+                ),
+            ]
+        )
     # Add column names
     df = column_pos[column_pos["name"] != ""]
     if df.shape[0] > 0:
