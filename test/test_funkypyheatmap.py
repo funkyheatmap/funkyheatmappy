@@ -1,10 +1,12 @@
 """
 Tests for `funkypyheatmap` module.
 """
+import matplotlib
 import pytest
 from funkypyheatmap import funkypyheatmap
 import pandas as pd
 import numpy as np
+import matplotlib.cm as cm
 
 
 @pytest.fixture(scope="session")
@@ -99,18 +101,29 @@ class TestFunkypyheatmap(object):
             {
                 "Category": ["Overall", "Group1", "Group2"],
                 "group": ["overall", "group1", "group2"],
+                "palette": ["overall", "palette1", "palette2"],
             }
         )
         row_info = pd.DataFrame(
             {"id": mtcars["id"], "group": "test"}, index=mtcars["id"]
         )
         row_groups = pd.DataFrame({"Group": ["Test"], "group": ["test"]})
+        norm = matplotlib.colors.Normalize(vmin=0, vmax=101, clip=True)
+        mapper = cm.ScalarMappable(norm=norm, cmap="Greys")
+        colors = [mapper.to_rgba(i) for i in range(0, 101)]
+        palettes = pd.DataFrame(
+            {
+                "palettes": ["overall", "palette1", "palette2"],
+                "colours": [colors, "Blues", "Reds"],
+            }
+        )
         funkypyheatmap.funkyheatmap(
             data=mtcars,
             column_info=column_info,
             column_groups=column_groups,
             row_info=row_info,
             row_groups=row_groups,
+            palettes=palettes,
             expand={"xmax": 4},
         )
         print("hello world")

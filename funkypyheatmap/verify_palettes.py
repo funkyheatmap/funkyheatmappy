@@ -58,7 +58,7 @@ def verify_palettes(data, column_info, palettes=None):
 
     # deframe palettes if it is a pandas dataframe
     if isinstance(palettes, pd.DataFrame):
-        palettes = palettes.to_dict()
+        palettes = {row["palettes"]: row["colours"] for _, row in palettes.iterrows()}
 
     # check palettes
     assert isinstance(palettes, dict), "palettes must be a dictionary"

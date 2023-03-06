@@ -209,18 +209,35 @@ def calculate_positions(
         column_annotation = pd.concat(
             [col_join.reset_index(drop=True), max_newlines], axis=1
         )
-        """column_annotation.groupby(["level", "name", "palette"]).apply(
-            lambda x: min(x["xmin"])
-        )
+        xmin = column_annotation.groupby(
+            ["level", "name", "palette"], dropna=False
+        ).apply(lambda x: min(x["xmin"]))
+        xmax = column_annotation.groupby(
+            ["level", "name", "palette"], dropna=False
+        ).apply(lambda x: max(x["xmax"]))
         column_annotation = (
-            column_annotation.groupby(["level", "name", "palette"])
-            .agg(xmin=("xmin", "min"), xmax=("xmax", "max"), x=("xmin", "mean"))
-            .reset_index()
-        )"""
-        column_annotation = column_annotation[
-            column_annotation["levelmatch"] == 1
-        ].sort_values("x")
+            pd.concat(
+                [
+                    xmin.index.to_frame(),
+                    xmin.rename("xmin"),
+                    xmax.rename("xmax"),
+                    ((xmin + xmax) / 2).rename("x"),
+                ],
+                axis=1,
+            )
+        ).reset_index(drop=True)
 
+        column_annotation = column_annotation.merge(
+            level_heights, on="level", how="left"
+        )
+        column_annotation = column_annotation[~pd.isna(column_annotation["name"])]
+        column_annotation = column_annotation[
+            column_annotation["name"].str.contains("[a-zA-Z]")
+        ]
+        # column_annotation["colour"] = palette_mids[column_annotation["palette"]]
+        column_annotation["colour"] = [
+            palette_mids[col] for col in column_annotation["palette"]
+        ]
         rect_data = pd.concat(
             [
                 rect_data,
@@ -251,7 +268,7 @@ def calculate_positions(
                         "ymax": column_annotation["ymax"],
                         "va": 0.5,
                         "ha": 0,
-                        "fontface": "bold",
+                        "fontweight": "bold",
                         "colour": "white",
                         "label_value": column_annotation["name"],
                     }

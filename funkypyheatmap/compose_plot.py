@@ -49,7 +49,7 @@ def compose_plot(positions, expand):
         )
         df = df.assign(
             border_colour=[
-                val if df["border"].iloc[i] else np.nan
+                val if df["border"].iloc[i] else None
                 for i, val in enumerate(df["border_colour"])
             ]
         )
