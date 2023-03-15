@@ -8,8 +8,8 @@ def verify_row_info(data, row_info=None):
 
     assert isinstance(row_info, pd.DataFrame), "row_info must be a pandas dataframe"
     # assert "id" in row_info.columns, "row_info must have a column named 'id'"
-    pd.testing.assert_index_equal(
-        data.index, row_info.index
+    assert set(row_info.index) == set(
+        data.index
     ), "row_info must have the same index as data"
     assert all(
         isinstance(s, str) for s in row_info.index

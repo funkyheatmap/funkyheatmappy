@@ -126,4 +126,3 @@ class TestFunkypyheatmap(object):
             palettes=palettes,
             expand={"xmax": 4},
         )
-        print("hello world")
