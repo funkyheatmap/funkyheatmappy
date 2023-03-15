@@ -16,6 +16,11 @@ def calculate_column_positions(column_info, col_space, col_bigspace):
     )
     column_pos[column_pos["do_spacing"]]["xsep"] = col_bigspace
     column_pos["xsep"] = column_pos["xsep"].fillna(col_space)
+
+    column_pos.loc[column_pos["do_spacing"], "xsep"] = col_bigspace
+    column_pos["width_temp"] = [0] + (column_pos["width"][:-1] * -1).values.tolist()
+    column_pos.loc[column_pos["overlay"], "xsep"] = column_pos["width_temp"]
+
     column_pos["xwidth"] = np.nan
     column_pos[column_pos["overlay"] & column_pos["width"] < 0]["xwidth"] = (
         column_pos["width"] - column_pos["xsep"]
