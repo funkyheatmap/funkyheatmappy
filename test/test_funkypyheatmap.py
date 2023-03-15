@@ -7,6 +7,7 @@ from funkypyheatmap import funkypyheatmap
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
+import csv
 
 
 @pytest.fixture(scope="session")
@@ -14,6 +15,13 @@ def mtcars():
     mtcars = pd.read_csv("./test/data/mtcars.csv")
     mtcars = mtcars.rename(columns={"Unnamed: 0": "id"})
     return mtcars
+
+
+@pytest.fixture(scope="session")
+def pies():
+
+    pies = pd.read_csv("./test/data/pie.csv", header=0, index_col=0)
+    return pies.to_dict("index")
 
 
 class TestFunkypyheatmap(object):
@@ -126,3 +134,8 @@ class TestFunkypyheatmap(object):
             palettes=palettes,
             expand={"xmax": 4},
         )
+
+    def test_pies(self, pies):
+        column_info = pd.DataFrame({"id": "pies", "geom": "pie"}, index=[0])
+
+        funkypyheatmap.funkyheatmap(data=pies, column_info=column_info)

@@ -1,0 +1,16 @@
+"Experiment","Category","group","palette"
+"Method","
+","method_characteristic","overall"
+"Summary","Aggregated scores per experiment","score_overall","overall"
+"Accuracy","Per metric","benchmark_metric","benchmark"
+"Accuracy","Per dataset source","benchmark_source","benchmark"
+"Accuracy","Per trajectory type","benchmark_trajtype","benchmark"
+"Accuracy","Errors","benchmark_execution","benchmark"
+"Scalability","Predicted time
+(#cells × #features)","scaling_predtime","scaling"
+"Scalability","Predicted memory
+(#cells × #features)","scaling_predmem","scaling"
+"Stability","Similarity
+between runs","stability","stability"
+"Usability","Quality of
+software and paper","qc_category","qc"
