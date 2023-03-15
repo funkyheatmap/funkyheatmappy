@@ -249,7 +249,7 @@ def calculate_positions(
                         "ymax": column_annotation["ymax"],
                         "colour": column_annotation["colour"],
                         "alpha": [
-                            1 if lm == 1 else 0.25
+                            1 if lm == 0 else 0.25
                             for lm in column_annotation["levelmatch"]
                         ],
                         "border": False,
@@ -534,4 +534,3 @@ def calculate_positions(
         # "bounds": bounds,
         "viz_params": row_space,
     }
-
