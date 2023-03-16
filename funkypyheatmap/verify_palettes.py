@@ -58,7 +58,7 @@ def verify_palettes(data, column_info, palettes=None):
 
     # deframe palettes if it is a pandas dataframe
     if isinstance(palettes, pd.DataFrame):
-        palettes = {row["palettes"]: row["colours"] for _, row in palettes.iterrows()}
+        palettes = {row[0]: row[1] for _, row in palettes.iterrows()}
 
     # check palettes
     assert isinstance(palettes, dict), "palettes must be a dictionary"
@@ -88,7 +88,9 @@ def verify_palettes(data, column_info, palettes=None):
             rotation_counter[palette_type] = counter
 
             palettes[palette_id] = palette_name
-        assert isinstance(palettes[palette_id], str), f"palettes must be strings"
+        assert all(
+            isinstance(i, str) for i in palettes[palette_id]
+        ), f"palettes must be strings"
 
         pal_value = palettes[palette_id]
 

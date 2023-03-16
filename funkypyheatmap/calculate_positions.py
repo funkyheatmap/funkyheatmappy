@@ -131,39 +131,59 @@ def calculate_positions(
     text_data = data_processor("text", text_fun)
 
     def pie_fun(dat):
-        value_col = dat[["value"]].reset_index().rename(columns={"index": "iii"})
-        value_col["iii"] = value_col["iii"] + 1
-        joined_data = dat.merge(value_col, on="iii").drop("iii", axis=1)
-        grouped_data = joined_data.groupby(["row_id", "column_id"]).apply(
-            lambda group: group.assign(
-                y0=group["y"],
-                x0=group["x"],
-                pct=group["value"].apply(lambda x: x if np.isfinite(x) else 0),
-                rad=group["pct"] / group["pct"].sum() * 2 * np.pi,
-                rad_end=group["pct"].cumsum() / group["pct"].sum() * 2 * np.pi,
-                rad_start=group["pct"].cumsum() / group["pct"].sum() * 2 * np.pi
-                - group["rad"],
-                r0=0,
-                r=row_height / 2,
-                value=group["name"],
-            )
-        )
-        filtered_data = grouped_data[
-            grouped_data["rad_end"] != grouped_data["rad_start"]
-        ]
-        filtered_data = filtered_data[filtered_data["pct"] >= 1e-10]
-        return filtered_data.reset_index(drop=True)
+        result = pd.DataFrame()
+        for _, row in dat.iterrows():
+            value_df = pd.DataFrame(row["value"], index=["end_angle"]).transpose()
+            pctgs = value_df["end_angle"] / value_df["end_angle"].sum()
+            value_df = (value_df / value_df.sum()) * 360
+            value_df = value_df.cumsum().fillna(0)
+            value_df["start_angle"] = value_df["end_angle"].shift(1).fillna(0)
+            value_df = value_df.loc[value_df["start_angle"] != value_df["end_angle"], :]
+            value_df["height"] = row_height / 2
+            value_df["x0"] = row["x"]
+            value_df["y0"] = row["y"]
+            value_df["row_id"] = row["row_id"]
+            value_df["value"] = value_df.index
+            value_df["pctgs"] = pctgs
+            result = pd.concat([result, value_df])
+        result = result.dropna(subset="value", axis=0)
+        dat = result.merge(dat.drop("value", axis=1), on=["row_id"], how="left")
+        return dat
 
     pie_data = data_processor("pie", pie_fun)
 
     # Add Annotations
     if plot_row_annotation:
-        row_annotation = (
-            row_groups.melt(id_vars="group", var_name="level", value_name="name")
-            .merge(column_pos[["group", "xmin", "xmax"]], how="left", on="group")
-            .groupby("name")
+        row_annotation = row_groups.melt(
+            id_vars="group", var_name="level", value_name="name"
+        ).merge(row_pos[["group", "ymin", "ymax"]], how="left", on="group")
+
+        row_annotation = pd.DataFrame(
+            {
+                "ymin": row_annotation.groupby("name").apply(lambda x: min(x["ymin"])),
+                "ymax": row_annotation.groupby("name").apply(lambda x: max(x["ymax"])),
+            }
         )
-        # to add
+        row_annotation["y"] = (row_annotation["ymin"] + row_annotation["ymax"]) / 2
+        row_annotation["xmin"] = -0.5
+        row_annotation["xmax"] = 5
+        row_annotation = row_annotation[
+            (~pd.isna(row_annotation.index)) & (row_annotation.index != "")
+        ]
+
+        text_data_rows = pd.DataFrame(
+            {
+                "xmin": row_annotation["xmin"],
+                "xmax": row_annotation["xmax"],
+                "ymin": row_annotation["ymax"] + row_space,
+                "label_value": [re.sub("\n", " ", x) for x in row_annotation.index],
+                "ha": 0,
+                "va": 0.5,
+                "fontweight": "bold",
+                "ymax": (row_annotation["ymax"] + row_space) + row_height,
+            }
+        )
+        text_data = pd.concat([text_data, text_data_rows])
 
     if plot_column_annotation:
         col_join = column_groups.melt(
@@ -195,19 +215,19 @@ def calculate_positions(
         )
         level_heights["ymin"] = level_heights["ymax"] - level_heights["height"]
         level_heights["y"] = (level_heights["ymin"] + level_heights["ymax"]) / 2
-
         palette_mids = {
-            x: palettes[x][round(len(palettes[x]) / 2)] for x in palettes.keys()
+            x: palettes[x][round(len(palettes[x]) / 2)]
+            if isinstance(palettes[x], list)
+            else list(palettes[x].values())[round(len(palettes[x]) / 2)]
+            for x in palettes.keys()
         }
-
         max_newlines = (
             col_join.groupby("level")
-            .apply(lambda x: x["name"].str.count("\n"))
+            .apply(lambda x: x["name"].str.count("\n").max())
             .transpose()
         )
-        max_newlines.columns = ["max_newlines"]
-        column_annotation = pd.concat(
-            [col_join.reset_index(drop=True), max_newlines], axis=1
+        column_annotation = col_join.merge(
+            max_newlines.rename("max_newlines"), on="level", how="left"
         )
         xmin = column_annotation.groupby(
             ["level", "name", "palette"], dropna=False
@@ -275,6 +295,29 @@ def calculate_positions(
                 ),
             ]
         )
+
+        if add_abc:
+            alphabet = list(map(chr, range(97, 123)))
+            c_a_df = (
+                column_annotation[column_annotation["levelmatch"] == 1]
+                .sort_values("x")
+                .reset_index(drop=True)
+            )
+            text_data_abc = pd.DataFrame(
+                {
+                    "xmin": c_a_df["xmin"] + col_space,
+                    "xmax": c_a_df["xmax"] - col_space,
+                    "ymin": c_a_df["ymin"],
+                    "ymax": c_a_df["ymax"],
+                    "va": 0.5,
+                    "ha": 0,
+                    "fontweight": "bold",
+                    "colour": "white",
+                    "label_value": [alphabet[i] + ")" for i in c_a_df.index],
+                }
+            )
+            text_data = pd.concat([text_data, text_data_abc])
+
     # Add column names
     df = column_pos[column_pos["name"] != ""]
     if df.shape[0] > 0:

@@ -18,10 +18,43 @@ def mtcars():
 
 
 @pytest.fixture(scope="session")
-def pies():
+def dynbenchmark_data():
+    pies = pd.read_csv("./test/data/dynbenchmark_pie.csv", header=0, index_col=0)
+    data = pd.read_csv("./test/data/dynbenchmark_data.csv")
+    data["benchmark_overall_error_reasons"] = pies.to_dict("index").values()
+    column_groups = pd.read_csv("./test/data/dynbenchmark_column_groups.csv")
+    column_info = pd.read_csv(
+        "./test/data/dynbenchmark_column_info.csv",
+        index_col="id",
+        keep_default_na=False,
+        na_values=["NaN"],
+    )
+    row_groups = pd.read_csv("./test/data/dynbenchmark_row_groups.csv")
+    row_info = pd.read_csv("./test/data/dynbenchmark_row_info.csv", index_col="id")
+    palettes = pd.read_csv("./test/data/dynbenchmark_palettes.csv")
+    palettes["colours"] = palettes.colours.apply(lambda x: x.split(", "))
+    names_error_r = [
+        "Memory limit exceeded",
+        "Time limit exceeded",
+        "Execution error",
+        "Method error",
+    ]
+    options = pd.read_csv("./test/data/dynbenchmark_options.csv")
+    options = [
+        {k: v for k, v in m.items() if pd.notnull(v)}
+        for m in options.to_dict(orient="records")
+    ]
+    column_info["options"] = options
 
-    pies = pd.read_csv("./test/data/pie.csv", header=0, index_col=0)
-    return pies.to_dict("index")
+    palettes["colours"][5] = dict(zip(names_error_r, palettes["colours"][5]))
+    return {
+        "data": data,
+        "column_groups": column_groups,
+        "column_info": column_info,
+        "row_groups": row_groups,
+        "row_info": row_info,
+        "palettes": palettes,
+    }
 
 
 class TestFunkypyheatmap(object):
@@ -135,7 +168,13 @@ class TestFunkypyheatmap(object):
             expand={"xmax": 4},
         )
 
-    def test_pies(self, pies):
-        column_info = pd.DataFrame({"id": "pies", "geom": "pie"}, index=[0])
-
-        funkypyheatmap.funkyheatmap(data=pies, column_info=column_info)
+    def test_dynbenchmark(self, dynbenchmark_data):
+        funkypyheatmap.funkyheatmap(
+            data=dynbenchmark_data["data"],
+            column_info=dynbenchmark_data["column_info"],
+            column_groups=dynbenchmark_data["column_groups"],
+            row_info=dynbenchmark_data["row_info"],
+            row_groups=dynbenchmark_data["row_groups"],
+            palettes=dynbenchmark_data["palettes"],
+            col_annot_offset=3.2,
+        )

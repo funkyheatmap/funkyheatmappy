@@ -1,15 +1,15 @@
 "group","id","name","geom","palette"
-"method_characteristic","method_name","","text",NA
-"method_characteristic","method_priors_required_str","Priors required","text",NA
-"method_characteristic","method_wrapper_type","Wrapper type","text",NA
-"method_characteristic","method_platform","Platform","text",NA
-"method_characteristic","method_topology_inference","Topology inference","text",NA
+"method_characteristic","method_Name","","text",NaN
+"method_characteristic","method_priors_required_str","Priors required","text",NaN
+"method_characteristic","method_wrapper_type","Wrapper type","text",NaN
+"method_characteristic","method_platform","Platform","text",NaN
+"method_characteristic","method_topology_inference","Topology inference","text",NaN
 "score_overall","summary_overall_overall","Overall","bar","overall"
 "score_overall","benchmark_overall_overall","Accuracy","bar","benchmark"
 "score_overall","scaling_pred_overall_overall","Scalability","bar","scaling"
 "score_overall","stability_overall_overall","Stability","bar","stability"
 "score_overall","qc_overall_overall","Usability","bar","qc"
-"score_overall","control_label","","text",NA
+"score_overall","control_label","","text",NaN
 "benchmark_metric","benchmark_overall_norm_him","Topology","funkyrect","benchmark"
 "benchmark_metric","benchmark_overall_norm_F1_branches","Branch assignment","funkyrect","benchmark"
 "benchmark_metric","benchmark_overall_norm_correlation","Cell positions","funkyrect","benchmark"
@@ -29,7 +29,7 @@
 "benchmark_trajtype","benchmark_tt_acyclic_graph","Acyclic","funkyrect","benchmark"
 "benchmark_trajtype","benchmark_tt_graph","Connected","funkyrect","benchmark"
 "benchmark_trajtype","benchmark_tt_disconnected_graph","Disconnected","funkyrect","benchmark"
-"benchmark_execution","benchmark_overall_pct_errored_str","% Errored","text",NA
+"benchmark_execution","benchmark_overall_pct_errored_str","% Errored","text",NaN
 "benchmark_execution","benchmark_overall_error_reasons","Reason","pie","error_reasons"
 "scaling_predtime","scaling_pred_scoretime_cells1m_features100","1m × 100","rect","scaling"
 "scaling_predtime","scaling_pred_scoretime_cells1m_features100","","text","white6black4"
@@ -41,7 +41,7 @@
 "scaling_predtime","scaling_pred_scoretime_cells1k_features100k","","text","white6black4"
 "scaling_predtime","scaling_pred_scoretime_cells100_features1m","100 × 1m","rect","scaling"
 "scaling_predtime","scaling_pred_scoretime_cells100_features1m","","text","white6black4"
-"scaling_predtime","benchmark_overall_time_predcor_str","Cor. pred. vs. real","text",NA
+"scaling_predtime","benchmark_overall_time_predcor_str","Cor. pred. vs. real","text",NaN
 "scaling_predmem","scaling_pred_scoremem_cells1m_features100","1m × 100","rect","scaling"
 "scaling_predmem","scaling_pred_scoremem_cells1m_features100","","text","white6black4"
 "scaling_predmem","scaling_pred_scoremem_cells100k_features1k","100k × 1k","rect","scaling"
@@ -52,7 +52,7 @@
 "scaling_predmem","scaling_pred_scoremem_cells1k_features100k","","text","white6black4"
 "scaling_predmem","scaling_pred_scoremem_cells100_features1m","100 × 1m","rect","scaling"
 "scaling_predmem","scaling_pred_scoremem_cells100_features1m","","text","white6black4"
-"scaling_predmem","benchmark_overall_mem_predcor_str","Cor. pred. vs. real","text",NA
+"scaling_predmem","benchmark_overall_mem_predcor_str","Cor. pred. vs. real","text",NaN
 "stability","stability_him","Topology","funkyrect","stability"
 "stability","stability_F1_branches","Branch assignment","funkyrect","stability"
 "stability","stability_correlation","Cell positions","funkyrect","stability"
@@ -63,4 +63,4 @@
 "qc_category","qc_cat_code_quality","Code quality","funkyrect","qc"
 "qc_category","qc_cat_documentation","Documentation","funkyrect","qc"
 "qc_category","qc_cat_paper","Paper","funkyrect","qc"
-"qc_category","control_label","","text",NA
+"qc_category","control_label","","text",NaN

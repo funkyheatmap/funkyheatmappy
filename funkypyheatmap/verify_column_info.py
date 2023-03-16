@@ -87,7 +87,7 @@ def verify_column_info(data, column_info=None):
     # checking overlay
     if "overlay" not in column_info.columns:
         column_info["overlay"] = False
-    column_info.loc[np.isnan(column_info["overlay"]), "overlay"] = False
+    column_info.loc[column_info["overlay"].isnull(), "overlay"] = False
     assert all(
         isinstance(s, bool) for s in column_info["overlay"]
     ), "column_info must have boolean overlays"

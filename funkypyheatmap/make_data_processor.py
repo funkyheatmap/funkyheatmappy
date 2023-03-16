@@ -19,7 +19,7 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
         for index, row in column_sels.iterrows():
             row["label"] = (
                 index
-                if row["geom"] == "text" and np.isnan(row["label"])
+                if row["geom"] == "text" and pd.isna(row["label"])
                 else row["label"]
             )
 
@@ -75,7 +75,6 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                 dat["value"] = dat.groupby("column_id")["value"].transform(
                     lambda x: (x - x.min()) / (x.max() - x.min())
                 )
-
             dat = fun(dat)
 
             # determine colours
@@ -84,15 +83,18 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                 if is_string_dtype(dat["value"]):
                     dat["col_value"] = dat["value"]
                 elif is_numeric_dtype(dat["value"]):
-                    dat["col_value"] = (dat["value"] * (len(palette_sel) - 1)).round(
-                        decimals=0
-                    )
+                    dat["col_value"] = [
+                        int(round(x * (len(palette_sel) - 1), 0))
+                        if not np.isnan(x)
+                        else pd.NA
+                        for x in dat["value"]
+                    ]
                 else:
                     dat["col_value"] = np.nan
 
                 dat = dat.assign(
                     colour=[
-                        "#444444FF" if np.isnan(col_val) else palette_sel[int(col_val)]
+                        "#444444FF" if pd.isna(col_val) else palette_sel[col_val]
                         for col_val in dat["col_value"]
                     ]
                 ).drop(["col_value", "value"], axis=1)

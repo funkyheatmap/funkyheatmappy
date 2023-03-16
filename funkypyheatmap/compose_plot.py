@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import pandas as pd
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
-from matplotlib.patches import Rectangle, Circle, FancyBboxPatch
+from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
 
 
 def compose_plot(positions, expand):
@@ -96,7 +96,18 @@ def compose_plot(positions, expand):
 
     # Plot pies
     if positions["pie_data"].shape[0] > 0:
-        pass
+        for _, row in positions["pie_data"].iterrows():
+            pies = Wedge(
+                (row["x0"], row["y0"]),
+                row["height"],
+                row["start_angle"],
+                row["end_angle"],
+                ec="black",
+                lw=0.5,
+                zorder=2,
+                fc=row["colour"],
+            )
+            ax.add_patch(pies)
 
     if positions["text_data"].shape[0] > 0:
         df = add_column_if_missing(
@@ -182,7 +193,7 @@ def compose_plot(positions, expand):
             ),
         )
 
-        df = df[df["label_value"] != ""]
+        df = df[(df["label_value"] != "") & (~df["label_value"].isnull())]
         for _, row in df.iterrows():
             if row["ha"] == 0.5:
                 ha = "center"
