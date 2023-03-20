@@ -222,4 +222,5 @@ def compose_plot(positions, expand):
 
     ax.axis("equal")
     plt.axis("off")
+    plt.savefig("test.svg")
     plt.show()
