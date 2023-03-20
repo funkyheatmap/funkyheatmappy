@@ -114,7 +114,7 @@ def compose_plot(positions, expand):
             positions["text_data"],
             ha=0.5,
             va=0.5,
-            size=7,
+            size=4,
             fontweight="normal",
             colour="black",
             linespacing=1,

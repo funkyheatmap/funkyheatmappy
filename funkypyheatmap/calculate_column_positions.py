@@ -12,10 +12,9 @@ def calculate_column_positions(column_info, col_space, col_bigspace):
     column_pos["xsep"] = col_space
     overlay_true = column_pos[column_pos["overlay"]]
     column_pos[column_pos["do_spacing"]]["xsep"] = col_bigspace
-    test = -1 * overlay_true["width"].shift(1).fillna(0)
-
-    column_pos.loc[column_pos["overlay"], "xsep"] = test
-    # column_pos[column_pos["overlay"]]["xsep"] = test
+    column_pos.loc[column_pos["overlay"], "xsep"] = -1 * overlay_true["width"].shift(
+        1
+    ).fillna(0)
 
     column_pos["xwidth"] = column_info["width"]
     overlay_true_and_width_neg = column_pos[

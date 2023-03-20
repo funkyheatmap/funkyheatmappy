@@ -55,7 +55,6 @@ def calculate_positions(
     )
 
     # Process data
-
     data_processor = make_data_processor(
         data=data,
         column_pos=column_pos,
@@ -198,11 +197,7 @@ def calculate_positions(
             1 - text_pct
         )
         level_heights["levelmatch"] = pd.Series(
-            [
-                column_groups.columns.tolist().index(x)
-                for x in level_heights.index
-                # if x in level_heights.index
-            ],
+            [column_groups.columns.tolist().index(x) for x in level_heights.index],
             index=level_heights.index,
             name="level",
         )
@@ -254,7 +249,6 @@ def calculate_positions(
         column_annotation = column_annotation[
             column_annotation["name"].str.contains("[a-zA-Z]")
         ]
-        # column_annotation["colour"] = palette_mids[column_annotation["palette"]]
         column_annotation["colour"] = [
             palette_mids[col] for col in column_annotation["palette"]
         ]
@@ -420,15 +414,18 @@ def calculate_positions(
             .groupby("palette")
             .first()
         )
-        # make legend
-
-        for i, (palette_label, row) in enumerate(rel_cols.iterrows()):
+        for palette_label, row in rel_cols.iterrows():
             palette = palettes[palette_label]
             pie_minimum_x = row["xmin"]
 
             pie_legenddf = pd.DataFrame.from_dict(
                 palette, orient="index", columns=["fill"]
             )
+            r = np.append(np.arange(90, -90, -(180 / len(palette))), [-90])
+            angles = [i if i >= 0 else i + 360 for i in r]
+
+            pie_legenddf["start_angle"] = angles[1 : len(palette) + 1]
+            pie_legenddf["end_angle"] = angles[0 : len(palette)]
             pie_legenddf["rad_start"] = np.linspace(0, np.pi, len(palette) + 1)[:-1]
             pie_legenddf["rad_end"] = np.linspace(0, np.pi, len(palette) + 1)[1:]
             pie_legenddf["rad"] = (
@@ -436,15 +433,15 @@ def calculate_positions(
             ) / 2
             pie_legenddf["color"] = "black"
             pie_legenddf["labx"] = row_height * np.sin(pie_legenddf["rad"])
-            pie_legenddf["laby"] = row_height * np.cos(pie_legenddf["rad"])
-            pie_legenddf.loc[:, "laby"].iloc[range(0, len(palette), 2)] += 0.2
-            pie_legenddf.loc[:, "laby"].iloc[range(1, len(palette), 2)] -= 0.2
+            begin = row_height * np.cos(pie_legenddf["rad"].iloc[0]) + 0.2
+            end = row_height * np.cos(pie_legenddf["rad"].iloc[len(palette) - 1]) - 0.2
+            pie_legenddf["laby"] = np.linspace(begin, end, len(palette))
             pie_legenddf["ha"] = 0
             pie_legenddf["va"] = 0.5
             pie_legenddf["xpt"] = row_height * np.sin(pie_legenddf["rad"])
             pie_legenddf["ypt"] = row_height * np.cos(pie_legenddf["rad"])
 
-            pie_title_data = pd.Series(
+            pie_title_data = pd.DataFrame(
                 {
                     "xmin": pie_minimum_x,
                     "xmax": pie_minimum_x,
@@ -454,17 +451,17 @@ def calculate_positions(
                     "ha": 0,
                     "va": 1,
                     "fontweight": "bold",
-                }
+                },
+                index=["pie_title"],
             )
 
             pie_pie_data = pd.DataFrame(
                 {
                     "x0": pie_minimum_x,
                     "y0": legend_pos - 2.75,
-                    "r0": 0,
-                    "r": row_height * 0.75,
-                    "rad_start": pie_legenddf["rad_start"],
-                    "rad_end": pie_legenddf["rad_end"],
+                    "height": row_height * 0.75,
+                    "start_angle": pie_legenddf["start_angle"],
+                    "end_angle": pie_legenddf["end_angle"],
                     "colour": pie_legenddf["fill"],
                 }
             )
