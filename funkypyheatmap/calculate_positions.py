@@ -422,6 +422,81 @@ def calculate_positions(
         )
         # make legend
 
+        for i, (palette_label, row) in enumerate(rel_cols.iterrows()):
+            palette = palettes[palette_label]
+            pie_minimum_x = row["xmin"]
+
+            pie_legenddf = pd.DataFrame.from_dict(
+                palette, orient="index", columns=["fill"]
+            )
+            pie_legenddf["rad_start"] = np.linspace(0, np.pi, len(palette) + 1)[:-1]
+            pie_legenddf["rad_end"] = np.linspace(0, np.pi, len(palette) + 1)[1:]
+            pie_legenddf["rad"] = (
+                pie_legenddf["rad_end"] + pie_legenddf["rad_start"]
+            ) / 2
+            pie_legenddf["color"] = "black"
+            pie_legenddf["labx"] = row_height * np.sin(pie_legenddf["rad"])
+            pie_legenddf["laby"] = row_height * np.cos(pie_legenddf["rad"])
+            pie_legenddf.loc[:, "laby"].iloc[range(0, len(palette), 2)] += 0.2
+            pie_legenddf.loc[:, "laby"].iloc[range(1, len(palette), 2)] -= 0.2
+            pie_legenddf["ha"] = 0
+            pie_legenddf["va"] = 0.5
+            pie_legenddf["xpt"] = row_height * np.sin(pie_legenddf["rad"])
+            pie_legenddf["ypt"] = row_height * np.cos(pie_legenddf["rad"])
+
+            pie_title_data = pd.Series(
+                {
+                    "xmin": pie_minimum_x,
+                    "xmax": pie_minimum_x,
+                    "ymin": legend_pos - 1.5,
+                    "ymax": legend_pos - 0.5,
+                    "label_value": row["name"],
+                    "ha": 0,
+                    "va": 1,
+                    "fontweight": "bold",
+                }
+            )
+
+            pie_pie_data = pd.DataFrame(
+                {
+                    "x0": pie_minimum_x,
+                    "y0": legend_pos - 2.75,
+                    "r0": 0,
+                    "r": row_height * 0.75,
+                    "rad_start": pie_legenddf["rad_start"],
+                    "rad_end": pie_legenddf["rad_end"],
+                    "colour": pie_legenddf["fill"],
+                }
+            )
+
+            pie_text_data = pd.DataFrame(
+                {
+                    "x": pie_minimum_x + 0.5 + pie_legenddf["labx"],
+                    "xmin": pie_minimum_x + 0.5 + pie_legenddf["labx"],
+                    "xmax": pie_minimum_x + 0.5 + pie_legenddf["labx"],
+                    "y": legend_pos - 2.75 + pie_legenddf["laby"],
+                    "ymin": legend_pos - 2.75 + pie_legenddf["laby"] - 0.4,
+                    "ymax": legend_pos - 2.75 + pie_legenddf["laby"] + 0.4,
+                    "label_value": pie_legenddf.index,
+                    "ha": pie_legenddf["ha"],
+                    "va": pie_legenddf["va"],
+                    "colour": pie_legenddf["color"],
+                }
+            )
+
+            pie_seg_data = pd.DataFrame(
+                {
+                    "x": pie_minimum_x + pie_legenddf["xpt"] * 0.85,
+                    "xend": pie_minimum_x + pie_legenddf["xpt"] * 1.1,
+                    "y": legend_pos - 2.75 + pie_legenddf["ypt"] * 0.85,
+                    "yend": legend_pos - 2.75 + pie_legenddf["ypt"] * 1.1,
+                }
+            )
+
+            text_data = pd.concat([text_data, pie_title_data, pie_text_data])
+            pie_data = pd.concat([pie_data, pie_pie_data])
+            segment_data = pd.concat([segment_data, pie_seg_data])
+
     if any(column_pos["geom"] == "funkyrect"):
         fr_minimum_x = column_pos[column_pos["geom"] == "funkyrect"]["xmin"].min()
         fr_legend_size = 1
