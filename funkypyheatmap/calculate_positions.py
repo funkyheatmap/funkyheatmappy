@@ -200,13 +200,13 @@ def calculate_positions(
         level_heights["levelmatch"] = pd.Series(
             [
                 column_groups.columns.tolist().index(x)
-                for x in column_groups.columns
-                if x in level_heights.index
+                for x in level_heights.index
+                # if x in level_heights.index
             ],
             index=level_heights.index,
             name="level",
         )
-        level_heights = level_heights.sort_values(["levelmatch"])
+        level_heights = level_heights.sort_values(["levelmatch"], ascending=False)
         level_heights["ysep"] = row_space
         level_heights["ymax"] = (
             col_annot_offset
@@ -287,9 +287,15 @@ def calculate_positions(
                         "ymin": column_annotation["ymin"],
                         "ymax": column_annotation["ymax"],
                         "va": 0.5,
-                        "ha": 0,
-                        "fontweight": "bold",
-                        "colour": "white",
+                        "ha": 0.5,
+                        "fontweight": [
+                            "bold" if lm == 0 else np.nan
+                            for lm in column_annotation["levelmatch"]
+                        ],
+                        "colour": [
+                            "white" if lm == 0 else "black"
+                            for lm in column_annotation["levelmatch"]
+                        ],
                         "label_value": column_annotation["name"],
                     }
                 ),
@@ -299,7 +305,7 @@ def calculate_positions(
         if add_abc:
             alphabet = list(map(chr, range(97, 123)))
             c_a_df = (
-                column_annotation[column_annotation["levelmatch"] == 1]
+                column_annotation[column_annotation["levelmatch"] == 0]
                 .sort_values("x")
                 .reset_index(drop=True)
             )
