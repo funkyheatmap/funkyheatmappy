@@ -7,7 +7,6 @@ from funkypyheatmap.calculate_row_positions import calculate_row_positions
 from funkypyheatmap.calculate_column_positions import calculate_column_positions
 from funkypyheatmap.verify_palettes import default_palettes
 from funkypyheatmap.make_data_processor import make_data_processor
-from itertools import product
 
 
 def calculate_positions(
@@ -63,7 +62,6 @@ def calculate_positions(
         palette_list=palettes,
     )
 
-    # segment_data = None
     def circle_fun(dat):
         dat = dat.assign(x0=dat["x"], y0=dat["y"], r=row_height / 2 * dat["value"])
         return dat
@@ -340,7 +338,6 @@ def calculate_positions(
         text_data = pd.concat([text_data, df_column_text])
 
     # Determine plotting window
-
     minimum_x = min(
         [
             min(lst, default=np.nan)

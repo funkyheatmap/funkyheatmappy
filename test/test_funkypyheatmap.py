@@ -7,7 +7,6 @@ from funkypyheatmap import funkypyheatmap
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
-import csv
 
 
 @pytest.fixture(scope="session")

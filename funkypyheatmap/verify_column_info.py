@@ -43,7 +43,6 @@ def verify_column_info(data, column_info=None):
 
     # checking geom
     if "geom" not in column_info.columns:
-        # column_info["geom"] = np.nan
         for col in data.columns:
             if is_numeric_dtype(data[col]):
                 column_info.loc[column_info.index == col, "geom"] = "funkyrect"

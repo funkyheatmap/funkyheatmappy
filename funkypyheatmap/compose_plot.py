@@ -223,4 +223,3 @@ def compose_plot(positions, expand):
     ax.axis("equal")
     plt.axis("off")
     plt.show()
-    _ = 0
