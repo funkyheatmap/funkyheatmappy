@@ -144,8 +144,15 @@ def dynbenchmark_data():
         {k: v for k, v in m.items() if pd.notnull(v)}
         for m in options.to_dict(orient="records")
     ]
-    column_info["options"] = options
 
+    column_info["options"] = options
+    column_info.loc["method_priors_required_str", "options"]["legend"] = {
+        "legend": {
+            "": "None",
+            "✕": "Weak: Start or end cells",
+            "✖": "Strong: Cell grouping or time course",
+        }
+    }
     palettes["colours"][5] = dict(zip(names_error_r, palettes["colours"][5]))
     return {
         "data": data,

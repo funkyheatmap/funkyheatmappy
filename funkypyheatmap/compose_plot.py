@@ -207,7 +207,7 @@ def compose_plot(positions, expand):
             ),
         )
 
-        df = df[(df["label_value"] != "") & (~df["label_value"].isnull())]
+        df = df[(df["label_value"].str.len() != 0) & (~df["label_value"].isnull())]
         for _, row in df.iterrows():
             if row["ha"] == 0.5:
                 ha = "center"

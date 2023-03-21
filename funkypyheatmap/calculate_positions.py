@@ -24,7 +24,6 @@ def calculate_positions(
 ):
     row_height = 1
     row_space = 0.1
-    row_bigspace = 0.5
     col_width = 1
     col_space = 0.1
     col_bigspace = 0.5
@@ -154,7 +153,7 @@ def calculate_positions(
         return dat
 
     image_data = data_processor("image", image_fun)
-    
+
     # Add Annotations
     if plot_row_annotation:
         row_annotation = row_groups.melt(
@@ -410,6 +409,8 @@ def calculate_positions(
 
     # Create legends
     legend_pos = minimum_y
+
+    # Pie legend
     if any(column_pos["geom"] == "pie"):
         rel_cols = (
             column_pos[column_pos["geom"] == "pie"]
@@ -497,6 +498,7 @@ def calculate_positions(
             pie_data = pd.concat([pie_data, pie_pie_data])
             segment_data = pd.concat([segment_data, pie_seg_data])
 
+    # Funky rectangle legend
     if any(column_pos["geom"] == "funkyrect"):
         fr_minimum_x = column_pos[column_pos["geom"] == "funkyrect"]["xmin"].min()
         fr_legend_size = 1
@@ -625,6 +627,63 @@ def calculate_positions(
         text_data = pd.concat([text_data, fr_title_data, fr_value_data])
         funkyrect_data = pd.concat([funkyrect_data, fr_poly_data2])
 
+    # Text legend
+    df_text_legend = column_info[
+        (column_info["geom"] == "text") & pd.notna(column_info["legend"])
+    ]
+    if df_text_legend.shape[0] > 0:
+        pr_minimum_x = column_pos.loc[[df_text_legend.index[0]]]["xmin"].min()
+        legend_vals = pd.DataFrame.from_dict(
+            df_text_legend["legend"].values[0], orient="columns"
+        )
+        legend_vals["legend_vals"] = legend_vals.index
+        legend_vals = legend_vals.reset_index(drop=True)
+        pr_labels_df = legend_vals.assign(
+            lab_x1=pr_minimum_x,
+            lab_x2=pr_minimum_x + 1,
+            lab_y=legend_pos - 1 - (legend_vals.index + 1) * row_height * 0.9,
+        )
+
+        pr_text_data = pd.concat(
+            [
+                pd.DataFrame(
+                    {
+                        "xmin": [pr_minimum_x],
+                        "xmax": [pr_minimum_x],
+                        "ymin": [legend_pos - 1.5],
+                        "ymax": [legend_pos - 0.5],
+                        "label_value": [df_text_legend["name"].values[0]],
+                        "ha": 0,
+                        "va": 1,
+                        "fontweight": ["bold"],
+                    }
+                ),
+                pd.DataFrame(
+                    {
+                        "xmin": pr_labels_df["lab_x1"],
+                        "xmax": pr_labels_df["lab_x1"],
+                        "ymin": pr_labels_df["lab_y"],
+                        "ymax": pr_labels_df["lab_y"],
+                        "label_value": pr_labels_df["legend_vals"],
+                        "ha": 0,
+                        "va": 0,
+                    }
+                ),
+                pd.DataFrame(
+                    {
+                        "xmin": pr_labels_df["lab_x2"],
+                        "xmax": pr_labels_df["lab_x2"],
+                        "ymin": pr_labels_df["lab_y"],
+                        "ymax": pr_labels_df["lab_y"],
+                        "label_value": pr_labels_df["legend"],
+                        "ha": 0,
+                        "va": 0,
+                    }
+                ),
+            ]
+        )
+        text_data = pd.concat([text_data, pr_text_data])
+
     # Simplify certain geoms
     if funkyrect_data.shape[0] > 0:
         circle_data = pd.concat(
@@ -656,6 +715,11 @@ def calculate_positions(
         "pie_data": pie_data,
         "text_data": text_data,
         "image_data": image_data,
-        # "bounds": bounds,
+        "bounds": {
+            "minimum_x": minimum_x,
+            "maximum_x": maximum_x,
+            "minimum_y": minimum_y,
+            "maximum_y": maximum_y,
+        },
         "viz_params": row_space,
     }
