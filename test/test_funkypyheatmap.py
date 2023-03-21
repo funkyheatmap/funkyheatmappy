@@ -185,9 +185,7 @@ class TestFunkypyheatmap(object):
                         "group": ["group2"],
                         "name": ["Type of engine"],
                         "geom": ["image"],
-                        "options": [
-                            {"path": "C:/Users/artuurc/Desktop", "filetype": "png"}
-                        ],
+                        "options": [{"path": "./test/data/", "filetype": "png"}],
                         "palette": [np.nan],
                     },
                     index=["type"],
