@@ -51,7 +51,9 @@ def verify_column_info(data, column_info=None):
             elif is_dict_like(data[col]):
                 column_info.loc[column_info.index == col, "geom"] = "pie"
     assert all(
-        column_info["geom"].isin(["funkyrect", "text", "pie", "circle", "rect", "bar"])
+        column_info["geom"].isin(
+            ["funkyrect", "text", "pie", "circle", "rect", "bar", "image"]
+        )
     ), "column_info must have a valid geom"
     assert all(
         isinstance(s, str) for s in column_info["geom"]

@@ -149,6 +149,12 @@ def calculate_positions(
 
     pie_data = data_processor("pie", pie_fun)
 
+    def image_fun(dat):
+        dat = dat.assign(y0=dat["y"] - row_height, height=row_height, width=row_height)
+        return dat
+
+    image_data = data_processor("image", image_fun)
+    
     # Add Annotations
     if plot_row_annotation:
         row_annotation = row_groups.melt(
@@ -649,6 +655,7 @@ def calculate_positions(
         "funkyrect_data": funkyrect_data,
         "pie_data": pie_data,
         "text_data": text_data,
+        "image_data": image_data,
         # "bounds": bounds,
         "viz_params": row_space,
     }

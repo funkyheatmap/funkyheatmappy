@@ -4,6 +4,7 @@ import pandas as pd
 from funkypyheatmap.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
 from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 
 def compose_plot(positions, expand):
@@ -109,6 +110,19 @@ def compose_plot(positions, expand):
             )
             ax.add_patch(pies)
 
+    # Plot images
+    if positions["image_data"].shape[0] > 0:
+        for _, row in positions["image_data"].iterrows():
+            arr_img = plt.imread(
+                row["path"] + "/" + row["value"] + "." + row["filetype"]
+            )
+            if "zoom" not in row.index:
+                row["zoom"] = arr_img.shape[0] / 51200
+            imagebox = OffsetImage(arr_img, zoom=row["zoom"])
+            ab = AnnotationBbox(imagebox, (row["x"], row["y"]), frameon=False)
+            ax.add_artist(ab)
+
+    # Plot test
     if positions["text_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["text_data"],
