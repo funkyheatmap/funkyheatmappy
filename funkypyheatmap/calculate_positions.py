@@ -603,8 +603,8 @@ def calculate_positions(
                 "ymin": [legend_pos - 1.5],
                 "ymax": [legend_pos - 0.5],
                 "label_value": ["Score"],
-                "hjust": [0],
-                "vjust": [1],
+                "ha": [0],
+                "va": [1],
                 "fontweight": ["bold"],
             }
         )
@@ -615,8 +615,8 @@ def calculate_positions(
                 "ymax": fr_value_data["ymin"],
                 "xmin": fr_value_data["xmin"],
                 "xmax": fr_value_data["xmax"],
-                "hjust": 0.5,
-                "vjust": 0,
+                "ha": 0.5,
+                "va": 0,
                 "label_value": [
                     round(val, 0) if val in [0, 1] else round(val, 1)
                     for val in fr_value_data["value"]
