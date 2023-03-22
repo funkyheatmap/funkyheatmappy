@@ -629,7 +629,9 @@ def calculate_positions(
 
     # Text legend
     df_text_legend = column_info[
-        (column_info["geom"] == "text") & pd.notna(column_info["legend"])
+        (column_info["geom"] == "text")
+        & pd.notna(column_info["legend"])
+        & (column_info["legend"] != False)
     ]
     if df_text_legend.shape[0] > 0:
         pr_minimum_x = column_pos.loc[[df_text_legend.index[0]]]["xmin"].min()
