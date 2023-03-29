@@ -233,7 +233,31 @@ def compose_plot(positions, expand):
                 ha=ha,
                 va=va,
             )
+    # Add size
+    minimum_x = (
+        positions["bounds"]["minimum_x"] - expand["xmin"]
+        if "xmin" in expand.keys()
+        else 0
+    )
+    maximum_x = (
+        positions["bounds"]["maximum_x"] + expand["xmax"]
+        if "xmax" in expand.keys()
+        else 0
+    )
+    minimum_y = (
+        positions["bounds"]["minimum_y"] - expand["ymin"]
+        if "ymin" in expand.keys()
+        else 0
+    )
+    maximum_y = (
+        positions["bounds"]["maximum_y"] + expand["ymax"]
+        if "ymax" in expand.keys()
+        else 0
+    )
+    ax.set_ylim(minimum_y, maximum_y)
+    ax.set_xlim(minimum_x, maximum_x)
 
+    # Plot
     ax.axis("equal")
     plt.axis("off")
     plt.show()
