@@ -11,6 +11,7 @@ def verify_row_info(data, row_info=None):
     assert set(row_info.index) == set(
         data.index
     ), "row_info must have the same index as data"
+    row_info = row_info.reindex(data.index)
     assert all(
         isinstance(s, str) for s in row_info.index
     ), "row_info must have string ids"

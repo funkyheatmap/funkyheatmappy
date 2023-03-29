@@ -169,6 +169,9 @@ class TestFunkypyheatmap(object):
         funkypyheatmap.funkyheatmap(mtcars["data"])
 
     def test_mtcars_extended(self, mtcars):
+        mtcars["data"] = (
+            mtcars["data"].sort_values(by="mpg", ascending=False).reset_index(drop=True)
+        )
         funkypyheatmap.funkyheatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
