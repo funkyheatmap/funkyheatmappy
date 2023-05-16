@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
 import re
-from funkypyheatmap.score_to_funkyrectangle import score_to_funkyrectangle
-from funkypyheatmap.add_column_if_missing import add_column_if_missing
-from funkypyheatmap.calculate_row_positions import calculate_row_positions
-from funkypyheatmap.calculate_column_positions import calculate_column_positions
-from funkypyheatmap.verify_palettes import default_palettes
-from funkypyheatmap.make_data_processor import make_data_processor
+from funkyheatmappy.score_to_funkyrectangle import score_to_funkyrectangle
+from funkyheatmappy.add_column_if_missing import add_column_if_missing
+from funkyheatmappy.calculate_row_positions import calculate_row_positions
+from funkyheatmappy.calculate_column_positions import calculate_column_positions
+from funkyheatmappy.verify_palettes import default_palettes
+from funkyheatmappy.make_data_processor import make_data_processor
 
 
 def calculate_positions(

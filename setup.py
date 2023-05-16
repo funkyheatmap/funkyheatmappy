@@ -18,27 +18,27 @@ doclink = """
 Documentation
 -------------
 
-The full documentation is at http://funkypyheatmap.rtfd.org."""
+The full documentation is at http://funkyheatmappy.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
-    name='funkypyheatmap',
+    name='funkyheatmappy',
     version='0.0.1',
     description='Funkyheatmap in Python',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
     author='Artuur Couckuyt',
     author_email='artuur_couckuyt@hotmail.com',
-    url='https://github.com/LouiseDck/funkypyheatmap',
+    url='https://github.com/funkyheatmap/funkyheatmappy',
     packages=[
-        'funkypyheatmap',
+        'funkyheatmappy',
     ],
-    package_dir={'funkypyheatmap': 'funkypyheatmap'},
+    package_dir={'funkyheatmappy': 'funkyheatmappy'},
     include_package_data=True,
     install_requires=[
     ],
     license='MIT',
     zip_safe=False,
-    keywords='funkypyheatmap',
+    keywords='funkyheatmappy',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

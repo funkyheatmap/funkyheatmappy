@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from funkypyheatmap.add_column_if_missing import add_column_if_missing
+from funkyheatmappy.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
 from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox

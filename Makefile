@@ -24,7 +24,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 funkypyheatmap test
+	flake8 funkyheatmappy test
 
 test:
 	py.test
@@ -33,15 +33,15 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source funkypyheatmap setup.py test
+	coverage run --source funkyheatmappy setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
 
 docs:
-	rm -f docs/funkypyheatmap.rst
+	rm -f docs/funkyheatmappy.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ funkypyheatmap
+	sphinx-apidoc -o docs/ funkyheatmappy
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html

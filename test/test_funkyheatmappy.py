@@ -1,9 +1,9 @@
 """
-Tests for `funkypyheatmap` module.
+Tests for `funkyheatmappy` module.
 """
 import matplotlib
 import pytest
-from funkypyheatmap import funkypyheatmap
+from funkyheatmappy import funkyheatmappy
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
@@ -164,15 +164,15 @@ def dynbenchmark_data():
     }
 
 
-class TestFunkypyheatmap(object):
+class Testfunkyheatmappy(object):
     def test_mtcars(self, mtcars):
-        funkypyheatmap.funkyheatmap(mtcars["data"])
+        funkyheatmappy.funkyheatmap(mtcars["data"])
 
     def test_mtcars_extended(self, mtcars):
         mtcars["data"] = (
             mtcars["data"].sort_values(by="mpg", ascending=False).reset_index(drop=True)
         )
-        funkypyheatmap.funkyheatmap(
+        funkyheatmappy.funkyheatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
             column_groups=mtcars["column_groups"],
@@ -202,7 +202,7 @@ class TestFunkypyheatmap(object):
                 ),
             ]
         )
-        funkypyheatmap.funkyheatmap(
+        funkyheatmappy.funkyheatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
             column_groups=mtcars["column_groups"],
@@ -213,7 +213,7 @@ class TestFunkypyheatmap(object):
         )
 
     def test_dynbenchmark(self, dynbenchmark_data):
-        funkypyheatmap.funkyheatmap(
+        funkyheatmappy.funkyheatmap(
             data=dynbenchmark_data["data"],
             column_info=dynbenchmark_data["column_info"],
             column_groups=dynbenchmark_data["column_groups"],
