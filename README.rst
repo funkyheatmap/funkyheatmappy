@@ -1,5 +1,5 @@
 =============================
-funkypyheatmap
+funkyheatmappy
 =============================
 
 Funkyheatmap in Python: Generating Funky Heatmaps for Data Frames
@@ -29,7 +29,7 @@ Installation
 
 You can install funkyheatmap like so:::
 
-    pip install git+https://github.com/funkyheatmap/funkypyheatmap
+    pip install git+https://github.com/funkyheatmap/funkyheatmappy
 
 You can also download `funkyheatmap` as a `standalone
 executable <http://funkyheatmap.dynverse.org/articles/executable.html>`_

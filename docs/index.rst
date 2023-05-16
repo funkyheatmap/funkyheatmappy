@@ -20,8 +20,8 @@ Contents:
 Feedback
 ========
 
-If you have any suggestions or questions about **funkypyheatmap** feel free to email me
+If you have any suggestions or questions about **funkyheatmappy** feel free to email me
 at artuur_couckuyt@hotmail.com.
 
-If you encounter any errors or problems with **funkypyheatmap**, please let me know!
-Open an Issue at the GitHub http://github.com/LouiseDck/funkypyheatmap main repository.
+If you encounter any errors or problems with **funkyheatmappy**, please let me know!
+Open an Issue at the GitHub http://github.com/funkyheatmap/funkyheatmappy main repository.

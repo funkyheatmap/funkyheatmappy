@@ -4,7 +4,7 @@ Demo with mtcars
 
 Import packages::
 
-    from funkypyheatmap import funkyheatmap
+    from funkyheatmappy import funkyheatmap
     import pandas as pd
 
 Load data::

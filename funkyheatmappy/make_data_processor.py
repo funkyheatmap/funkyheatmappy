@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
-from funkypyheatmap.add_column_if_missing import add_column_if_missing
+from funkyheatmappy.add_column_if_missing import add_column_if_missing
 
 
 def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):

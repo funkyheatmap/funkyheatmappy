@@ -2,6 +2,6 @@
 Usage
 ========
 
-To use funkypyheatmap in a project::
+To use funkyheatmappy in a project::
 
-	import funkypyheatmap
+	import funkyheatmappy
