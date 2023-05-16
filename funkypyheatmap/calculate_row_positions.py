@@ -8,7 +8,7 @@ def calculate_row_positions(row_info, row_height, row_space):
     row_pos["row_i"] = range(len(row_pos))
     row_pos["color_background"] = row_pos["group_i"] % 2 == 0
     row_pos["do_spacing"] = row_pos.groupby("group").ngroup().diff() != 0
-    row_pos["do_spacing"].iloc[0] = False
+    row_pos.loc[row_pos.index[0], "do_spacing"] = False
     row_pos["ysep"] = [
         row_height + 2 * row_space if spacing else row_space
         for spacing in row_pos["do_spacing"]
