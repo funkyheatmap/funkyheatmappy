@@ -8,7 +8,7 @@ from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 
 
-def funkyheatmap(
+def funky_heatmap(
     data,
     column_info=None,
     row_info=None,

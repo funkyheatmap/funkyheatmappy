@@ -4,7 +4,7 @@ Demo with mtcars
 
 Import packages::
 
-    from funkyheatmappy import funkyheatmap
+    from funkyheatmappy import funky_heatmap
     import pandas as pd
 
 Load data::
@@ -17,7 +17,7 @@ Load data::
     
 We can plot this data frame without any additional formatting, though it doesn't look very nice::
 
-    funkyheatmap(mtcars)
+    funky_heatmap(mtcars)
 
 By defining a few additional formatting parameters, we can get the plot to look much nicer.
 
@@ -147,7 +147,7 @@ Funkyheatmap
 
 ::
      
-    funkyheatmap(
+    funky_heatmap(
         data=mtcars,
         column_info=mtcarscolumn_info,
         column_groups=column_groups,
@@ -188,7 +188,7 @@ Add a new column to the mtcars data and to the column info::
 
 Generate funkyheatmap::
 
-    funkyheatmap(
+    funky_heatmap(
         data=mtcars,
         column_info=column_info,
         column_groups=column_groups,
@@ -217,7 +217,7 @@ Additionally you can add a zoom parameter to the options in column info which is
         ]
     )
 
-    funkyheatmap(
+    funky_heatmap(
         data=mtcars,
         column_info=column_info,
         column_groups=column_groups,
