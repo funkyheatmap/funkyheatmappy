@@ -5,7 +5,6 @@ import pandas as pd
 def verify_row_info(data, row_info=None):
     if row_info is None:
         row_info = pd.DataFrame(index=data.index)
-
     assert isinstance(row_info, pd.DataFrame), "row_info must be a pandas dataframe"
     # assert "id" in row_info.columns, "row_info must have a column named 'id'"
     assert set(row_info.index) == set(

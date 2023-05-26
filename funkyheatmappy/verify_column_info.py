@@ -8,6 +8,8 @@ def verify_column_info(data, column_info=None):
     if column_info is None:
         column_info = pd.DataFrame(index=data.columns)
         column_info.index.names = ["id"]
+    if "id" in column_info.columns:
+        column_info.index = column_info["id"]
     assert isinstance(
         column_info, pd.DataFrame
     ), "column_info must be a pandas dataframe"
@@ -37,6 +39,7 @@ def verify_column_info(data, column_info=None):
     # checking name
     if "name" not in column_info.columns:
         column_info["name"] = [re.sub("_", "", s).title() for s in column_info.index]
+    column_info["name"] = [ "" if not isinstance(name, str) else name for name in column_info["name"] ]
     assert all(
         isinstance(s, str) for s in column_info["name"]
     ), "column_info must have string names"
