@@ -7,7 +7,7 @@ from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 
-def compose_plot(positions, expand):
+def compose_plot(positions, position_args):
     fig, ax = plt.subplots()
 
     # Plot row backgrounds
@@ -235,23 +235,23 @@ def compose_plot(positions, expand):
             )
     # Add size
     minimum_x = (
-        positions["bounds"]["minimum_x"] - expand["xmin"]
-        if "xmin" in expand.keys()
+        positions["bounds"]["minimum_x"] - position_args["expand_xmin"]
+        if "expand_xmin" in position_args.keys()
         else 0
     )
     maximum_x = (
-        positions["bounds"]["maximum_x"] + expand["xmax"]
-        if "xmax" in expand.keys()
+        positions["bounds"]["maximum_x"] + position_args["expand_xmax"]
+        if "expand_xmax" in position_args.keys()
         else 0
     )
     minimum_y = (
-        positions["bounds"]["minimum_y"] - expand["ymin"]
-        if "ymin" in expand.keys()
+        positions["bounds"]["minimum_y"] - position_args["expand_ymin"]
+        if "expand_ymin" in position_args.keys()
         else 0
     )
     maximum_y = (
-        positions["bounds"]["maximum_y"] + expand["ymax"]
-        if "ymax" in expand.keys()
+        positions["bounds"]["maximum_y"] + position_args["expand_ymax"]
+        if "expand_ymax" in position_args.keys()
         else 0
     )
     ax.set_ylim(minimum_y, maximum_y)

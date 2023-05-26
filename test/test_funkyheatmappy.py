@@ -4,6 +4,7 @@ Tests for `funkyheatmappy` module.
 import matplotlib
 import pytest
 from funkyheatmappy import funkyheatmappy
+from funkyheatmappy.position_arguments import position_arguments
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
@@ -179,7 +180,7 @@ class Testfunkyheatmappy(object):
             row_info=mtcars["row_info"],
             row_groups=mtcars["row_groups"],
             palettes=mtcars["palettes"],
-            expand={"xmax": 4},
+            position_args=position_arguments(expand_xmax=4),
         )
 
     def test_mtcars_images(self, mtcars):
@@ -209,7 +210,7 @@ class Testfunkyheatmappy(object):
             row_info=mtcars["row_info"],
             row_groups=mtcars["row_groups"],
             palettes=mtcars["palettes"],
-            expand={"xmax": 4},
+            position_args=position_arguments(expand_xmax=4),
         )
 
     def test_dynbenchmark(self, dynbenchmark_data):
@@ -220,5 +221,5 @@ class Testfunkyheatmappy(object):
             row_info=dynbenchmark_data["row_info"],
             row_groups=dynbenchmark_data["row_groups"],
             palettes=dynbenchmark_data["palettes"],
-            col_annot_offset=3.2,
+            position_args=position_arguments(col_annot_offset=3.2),
         )

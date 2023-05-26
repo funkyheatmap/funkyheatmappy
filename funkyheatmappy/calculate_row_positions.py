@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def calculate_row_positions(row_info, row_height, row_space):
+def calculate_row_positions(row_info, row_height, row_space, row_bigspace):
     row_pos = pd.DataFrame(row_info).copy()
     row_pos["group_i"] = row_pos.groupby("group").cumcount()
     row_pos["row_i"] = range(len(row_pos))

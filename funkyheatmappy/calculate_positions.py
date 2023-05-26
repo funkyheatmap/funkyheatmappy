@@ -16,17 +16,19 @@ def calculate_positions(
     column_groups,
     row_groups,
     palettes,
+    position_args,
     scale_column,
     add_abc,
-    col_annot_offset,
-    col_annot_angle,
     removed_entries,
 ):
-    row_height = 1
-    row_space = 0.1
-    col_width = 1
-    col_space = 0.1
-    col_bigspace = 0.5
+    row_height = position_args["row_height"]
+    row_space = position_args["row_space"]
+    row_bigspace = position_args["row_bigspace"]
+    col_width = position_args["col_width"]
+    col_space = position_args["col_space"]
+    col_bigspace = position_args["col_bigspace"]
+    col_annot_offset = position_args["col_annot_offset"]
+    col_annot_angle = position_args["col_annot_angle"]
 
     # Determine row positions
     if not "group" in row_info.columns or all(pd.isna(row_info["group"])):
@@ -37,7 +39,10 @@ def calculate_positions(
         plot_row_annotation = True
 
     row_pos = calculate_row_positions(
-        row_info=row_info, row_height=row_height, row_space=row_space
+        row_info=row_info,
+        row_height=row_height,
+        row_space=row_space,
+        row_bigspace=row_bigspace,
     )
 
     # Determine column positions
