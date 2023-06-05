@@ -15,8 +15,8 @@ def calculate_row_positions(row_info, row_height, row_space, row_bigspace):
     ]
     row_pos["y"] = -1 * (
         np.add(
-            (row_pos["row_i"] + 1).tolist() * row_height,
-            row_pos["ysep"].cumsum().tolist(),
+            (row_pos["row_i"] + 1).to_numpy() * row_height,
+            row_pos["ysep"].cumsum().to_numpy(),
         )
     )
     row_pos["ymin"] = row_pos["y"] - row_height / 2

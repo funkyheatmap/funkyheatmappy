@@ -223,3 +223,29 @@ class Testfunkyheatmappy(object):
             palettes=dynbenchmark_data["palettes"],
             position_args=position_arguments(col_annot_offset=3.2),
         )
+
+    def test_position_arguments(self, dynbenchmark_data):
+        pos_arg = position_arguments(
+            row_height=4,
+            row_space=4,
+            row_bigspace=4,
+            col_width=4,
+            col_space=4,
+            col_bigspace=4,
+            col_annot_angle=4,
+            col_annot_offset=3.2,
+            expand_xmin=4,
+            expand_xmax=4,
+            expand_ymin=4,
+            expand_ymax=4,
+        )
+
+        funkyheatmappy.funky_heatmap(
+            data=dynbenchmark_data["data"],
+            column_info=dynbenchmark_data["column_info"],
+            column_groups=dynbenchmark_data["column_groups"],
+            row_info=dynbenchmark_data["row_info"],
+            row_groups=dynbenchmark_data["row_groups"],
+            palettes=dynbenchmark_data["palettes"],
+            position_args=pos_arg,
+        )
