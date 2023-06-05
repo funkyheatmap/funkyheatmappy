@@ -140,6 +140,11 @@ def calculate_positions(
             value_df = value_df.cumsum().fillna(0)
             value_df["start_angle"] = value_df["end_angle"].shift(1).fillna(0)
             value_df = value_df.loc[value_df["start_angle"] != value_df["end_angle"], :]
+
+            end_angle = (-1 * value_df["start_angle"] + 90) % 360
+            start_angle = (-1 * value_df["end_angle"] + 90) % 360
+            value_df["start_angle"], value_df["end_angle"] = start_angle, end_angle
+
             value_df["height"] = row_height / 2
             value_df["x0"] = row["x"]
             value_df["y0"] = row["y"]

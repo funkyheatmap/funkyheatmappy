@@ -5,6 +5,7 @@ from funkyheatmappy.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
 from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from matplotlib.transforms import Affine2D
 
 
 def compose_plot(positions, position_args):
@@ -98,11 +99,15 @@ def compose_plot(positions, position_args):
     # Plot pies
     if positions["pie_data"].shape[0] > 0:
         for _, row in positions["pie_data"].iterrows():
+            start_angle = row["start_angle"]
+            end_angle = row["end_angle"]
+            if end_angle == 90 and start_angle == 90:
+                start_angle, end_angle = 0, 360
             pies = Wedge(
                 (row["x0"], row["y0"]),
                 row["height"],
-                row["start_angle"],
-                row["end_angle"],
+                start_angle,
+                end_angle,
                 ec="black",
                 lw=0.5,
                 zorder=2,
@@ -122,7 +127,7 @@ def compose_plot(positions, position_args):
             ab = AnnotationBbox(imagebox, (row["x"], row["y"]), frameon=False)
             ax.add_artist(ab)
 
-    # Plot test
+    # Plot text
     if positions["text_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["text_data"],
