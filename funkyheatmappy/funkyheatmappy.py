@@ -122,4 +122,4 @@ def funky_heatmap(
         removed_entries,
     )
 
-    compose_plot(positions, position_args)
+    return compose_plot(positions, position_args)

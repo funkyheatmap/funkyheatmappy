@@ -9,7 +9,7 @@ from matplotlib.transforms import Affine2D
 
 
 def compose_plot(positions, position_args):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(layout="constrained")
 
     # Plot row backgrounds
     df = positions["row_pos"]
@@ -122,7 +122,7 @@ def compose_plot(positions, position_args):
                 row["path"] + "/" + row["value"] + "." + row["filetype"]
             )
             if "zoom" not in row.index:
-                row["zoom"] = arr_img.shape[0] / 51200
+                row["zoom"] = 0.05  # arr_img.shape[0] / 51200
             imagebox = OffsetImage(arr_img, zoom=row["zoom"])
             ab = AnnotationBbox(imagebox, (row["x"], row["y"]), frameon=False)
             ax.add_artist(ab)
@@ -133,7 +133,7 @@ def compose_plot(positions, position_args):
             positions["text_data"],
             ha=0.5,
             va=0.5,
-            size=4,
+            size=10,
             fontweight="normal",
             colour="black",
             linespacing=1,
@@ -265,4 +265,5 @@ def compose_plot(positions, position_args):
     # Plot
     ax.axis("equal")
     plt.axis("off")
-    plt.show()
+    # plt.show()
+    return fig
