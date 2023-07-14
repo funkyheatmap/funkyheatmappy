@@ -2,12 +2,7 @@
 Credits
 =======
 
-Development Lead
-----------------
 
 * Artuur Couckuyt <artuur_couckuyt@hotmail.com>
+* Louise Deconinck <louise.deconinck@gmail.com>
 
-Contributors
-------------
-
-None yet. Why not be the first?

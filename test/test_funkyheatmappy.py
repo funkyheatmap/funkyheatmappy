@@ -169,6 +169,7 @@ class Testfunkyheatmappy(object):
     def test_mtcars(self, mtcars):
         funkyheatmappy.funky_heatmap(mtcars["data"])
 
+
     def test_mtcars_extended(self, mtcars):
         mtcars["data"] = (
             mtcars["data"].sort_values(by="mpg", ascending=False).reset_index(drop=True)
@@ -203,7 +204,7 @@ class Testfunkyheatmappy(object):
                 ),
             ]
         )
-        fig = funkyheatmappy.funky_heatmap(
+        funkyheatmappy.funky_heatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
             column_groups=mtcars["column_groups"],
@@ -212,14 +213,10 @@ class Testfunkyheatmappy(object):
             palettes=mtcars["palettes"],
             position_args=position_arguments(expand_xmax=4),
         )
-        import matplotlib.pyplot as plt
 
-        fig_width, fig_height = plt.gcf().get_size_inches()
-        fig.set_size_inches(fig_width * 5, fig_height * 5)
-        fig.savefig("test_mtcars.png", dpi=300)
 
     def test_dynbenchmark(self, dynbenchmark_data):
-        fig = funkyheatmappy.funky_heatmap(
+        funkyheatmappy.funky_heatmap(
             data=dynbenchmark_data["data"],
             column_info=dynbenchmark_data["column_info"],
             column_groups=dynbenchmark_data["column_groups"],
@@ -228,11 +225,7 @@ class Testfunkyheatmappy(object):
             palettes=dynbenchmark_data["palettes"],
             position_args=position_arguments(col_annot_offset=4.2),
         )
-        import matplotlib.pyplot as plt
 
-        fig_width, fig_height = plt.gcf().get_size_inches()
-        fig.set_size_inches(fig_width * 5, fig_height * 5)
-        fig.savefig("test.png", dpi=300)
 
     def test_position_arguments(self, dynbenchmark_data):
         pos_arg = position_arguments(

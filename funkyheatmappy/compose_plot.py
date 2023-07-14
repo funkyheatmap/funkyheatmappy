@@ -9,7 +9,7 @@ from matplotlib.transforms import Affine2D
 
 
 def compose_plot(positions, position_args):
-    fig, ax = plt.subplots(layout="constrained")
+    fig, ax = plt.subplots(layout = "constrained")
 
     # Plot row backgrounds
     df = positions["row_pos"]
@@ -121,11 +121,7 @@ def compose_plot(positions, position_args):
             arr_img = plt.imread(
                 row["path"] + "/" + row["value"] + "." + row["filetype"]
             )
-            if "zoom" not in row.index:
-                row["zoom"] = 0.05  # arr_img.shape[0] / 51200
-            imagebox = OffsetImage(arr_img, zoom=row["zoom"])
-            ab = AnnotationBbox(imagebox, (row["x"], row["y"]), frameon=False)
-            ax.add_artist(ab)
+            ax.imshow(arr_img, extent=(row["xmin"], row["xmax"], row["ymin"], row["ymax"]))
 
     # Plot text
     if positions["text_data"].shape[0] > 0:
@@ -133,13 +129,16 @@ def compose_plot(positions, position_args):
             positions["text_data"],
             ha=0.5,
             va=0.5,
-            size=10,
+            size=3,
             fontweight="normal",
             colour="black",
             linespacing=1,
             angle=0,
             zorder=3,
         )
+
+        df["size"] = df["size"] * 3.3
+
         df = df.assign(angle2=np.multiply(np.divide(df["angle"], 360), 2 * np.pi))
         df = df.assign(
             cosa=np.round(np.cos(df["angle2"]), 2),
@@ -238,6 +237,7 @@ def compose_plot(positions, position_args):
                 ha=ha,
                 va=va,
             )
+
     # Add size
     minimum_x = (
         positions["bounds"]["minimum_x"] - position_args["expand_xmin"]
@@ -259,11 +259,14 @@ def compose_plot(positions, position_args):
         if "expand_ymax" in position_args.keys()
         else 0
     )
+
     ax.set_ylim(minimum_y, maximum_y)
     ax.set_xlim(minimum_x, maximum_x)
 
     # Plot
-    ax.axis("equal")
-    plt.axis("off")
-    # plt.show()
+    ax.axis("scaled")
+    ax.axis("off")
+    # Make sure that the plots are scaled correctly
+    fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
+
     return fig
