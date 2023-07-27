@@ -19,7 +19,6 @@ def funky_heatmap(
     position_args=position_arguments(),
     scale_column=True,
     add_abc=True,
-    removed_entries=None,
 ):
     """Generate a funky heatmaps for benchmarks
 
@@ -93,9 +92,6 @@ def funky_heatmap(
     :type col_annot_offset: float
     :param col_annot_angle: The angle of the column annotation labels.
     :type col_annot_angle: float
-    :param removed_entries: Which methods to not show in the rows. Missing
-    methods are replaced by a "Not shown" label.
-    :type removed_entries: list
     :param expand: A dictionary of directions to expand the plot in with the
     following keys: `"xmin"`, `"xmax"`, `"ymin"`, `"ymax"`.
     :type expand: dict
@@ -119,7 +115,6 @@ def funky_heatmap(
         position_args,
         scale_column,
         add_abc,
-        removed_entries,
     )
 
     return compose_plot(positions, position_args)

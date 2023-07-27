@@ -19,7 +19,6 @@ def calculate_positions(
     position_args,
     scale_column,
     add_abc,
-    removed_entries,
 ):
     row_height = position_args["row_height"]
     row_space = position_args["row_space"]
@@ -695,50 +694,6 @@ def calculate_positions(
             ]
         )
         text_data = pd.concat([text_data, pr_text_data])
-
-    # Remove entries
-    if removed_entries is not None:
-        rm_min_x = 20
-        num_cols = 2
-        num_rows = np.ceil(len(removed_entries) / num_cols)
-
-        rm_lab_df = pd.DataFrame({"label_value": removed_entries})
-        rm_lab_df = rm_lab_df.assign(
-            row=rm_lab_df.index - 1 % num_rows, col=np.ceil(rm_lab_df.index / num_cols)
-        )
-        rm_lab_df = rm_lab_df.assign(
-            x=rm_min_x + (rm_lab_df["col"] * 5),
-            y=legend_pos - (rm_lab_df["row"] + 2) * row_height * 0.9,
-        )
-
-        rm_text_data = pd.concat(
-            [
-                pd.DataFrame(
-                    {
-                        "xmin": rm_min_x,
-                        "xmax": rm_min_x,
-                        "ymin": legend_pos - 1.5,
-                        "ymax": legend_pos - 0.5,
-                        "label_value": "Not shown, insufficient data points",
-                        "ha": 0,
-                        "va": 1,
-                        "fontweight": "bold",
-                    },
-                    index=[0],
-                ),
-                pd.DataFrame(
-                    {
-                        "xmin": rm_lab_df["x"],
-                        "xmax": rm_lab_df["x"],
-                        "ymin": rm_lab_df["y"],
-                        "ymax": rm_lab_df["y"],
-                        "ha": 0,
-                        "va": 0,
-                    }
-                ),
-            ]
-        )
-        text_data = pd.concat([text_data, rm_text_data])
 
     # Simplify certain geoms
     if funkyrect_data.shape[0] > 0:
