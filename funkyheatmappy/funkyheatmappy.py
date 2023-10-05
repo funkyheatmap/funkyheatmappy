@@ -35,6 +35,10 @@ def funky_heatmap(
     This data frame should contain the `"id"` of `"data"`as indices and
     the following columns:
     `"id"` = The corresponding column name in `"data"`,
+    `"id_color"` = A column name in `data` to use for the color of the resulting 
+    geoms. If `NA`, the `id` column will be used.
+    `id_size` = A column name in `data` to use for the size of the resulting 
+    geoms. If `NA`, the `id` column will be used.
     `"name"` = A label for the column. If `NA` or `""`, no label will be plotted.
     If this column is missing, `id` will be used to generate the `name` column.,
     `"geom"` = The geom of the column. Must be one of: `"funkyrect"`, `"circle"`,
