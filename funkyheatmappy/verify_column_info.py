@@ -74,7 +74,7 @@ def verify_column_info(data, column_info=None):
     assert all(
         isinstance(s, str) or pd.isna(s) for s in column_info["id_color"]
     ), "column_info must have id_color"
-    assert all(pd.isna(column_info["id_color"])) | is_color_like(column_info["id_color"]) | all(s in column_info.columns for s in column_info["id_color"]), "column_info must have id_color"
+    assert all(pd.isna(column_info["id_color"])) | is_color_like(column_info["id_color"]) | all(s in data.columns for s in column_info["id_color"]), "column_info must have id_color"
 
     column_info.loc[pd.isna(column_info["id_color"]), "id_color"] = column_info["id"] # if nan, replace by id, except if text or image
     column_info.loc[column_info["geom"] == "text", "id_color"] = np.nan
@@ -84,7 +84,7 @@ def verify_column_info(data, column_info=None):
     if "id_size" not in column_info.columns:
         column_info["id_size"] = np.nan
     assert all(isinstance(s, str) or pd.isna(s) for s in column_info["id_size"]), "column_info must have id_size"
-    assert all(pd.isna(column_info["id_size"])) | all(s in column_info.columns for s in column_info["id_size"]), "column_info must have id_size"
+    assert all(pd.isna(column_info["id_size"])) | all(s in data.columns for s in column_info["id_size"]), "column_info must have id_size"
 
     column_info.loc[pd.isna(column_info["id_size"]), "id_size"] = column_info["id"] # if nan, replace by id, except if text or image
     column_info.loc[column_info["geom"] == "text", "id_size"] = np.nan
