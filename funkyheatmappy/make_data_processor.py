@@ -99,7 +99,6 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                     )
             
             dat = fun(dat)
-            dat["value"] = np.nan # this column is no longer needed
 
             # determine colours
             if row["geom"] != "image" and pd.notna(row["palette"]):
@@ -121,7 +120,7 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                         "#444444FF" if pd.isna(col_val) else palette_sel[col_val]
                         for col_val in dat["col_value"]
                     ]
-                ).drop(["col_value", "value"], axis=1)
+                ).drop(["col_value"], axis=1)
             result = pd.concat([result, dat])
         return result
 
