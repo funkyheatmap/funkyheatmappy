@@ -66,7 +66,7 @@ def calculate_positions(
     )
 
     def circle_fun(dat):
-        dat = dat.assign(x0=dat["x"], y0=dat["y"], r=row_height / 2 * dat["value"])
+        dat = dat.assign(x0=dat["x"], y0=dat["y"], r=row_height / 2 * dat["size_value"])
         return dat
 
     circle_data = data_processor("circle", circle_fun)
@@ -84,10 +84,11 @@ def calculate_positions(
                     xmax=row["xmax"],
                     ymin=row["ymin"],
                     ymax=row["ymax"],
-                    value=row["value"],
+                    size_value=row["size_value"],
+                    color_value=row["color_value"],
                     midpoint=0.8,
                 )
-                for _, row in dat[["xmin", "xmax", "ymin", "ymax", "value"]].iterrows()
+                for _, row in dat[["xmin", "xmax", "ymin", "ymax", "size_value", "color_value"]].iterrows()
             ]
         )
         return result
@@ -97,8 +98,8 @@ def calculate_positions(
     def bar_fun(dat):
         dat = add_column_if_missing(dat, hjust=0)
         dat = dat.assign(
-            xmin=dat["xmin"] + (1 - dat["value"]) * dat["xwidth"] * dat["hjust"],
-            xmax=dat["xmax"] - (1 - dat["value"]) * dat["xwidth"] * (1 - dat["hjust"]),
+            xmin=dat["xmin"] + (1 - dat["size_value"]) * dat["xwidth"] * dat["hjust"],
+            xmax=dat["xmax"] - (1 - dat["size_value"]) * dat["xwidth"] * (1 - dat["hjust"]),
         )
         return dat
 
@@ -116,7 +117,7 @@ def calculate_positions(
             .sort_values(["x", "xend"])
             .reset_index(drop=True)
             .drop_duplicates()
-            .assign(palette=np.nan, value=np.nan)
+            .assign(palette=np.nan, size_value=np.nan, color_value = np.nan)
         )
         return result
 
@@ -133,7 +134,7 @@ def calculate_positions(
     def pie_fun(dat):
         result = pd.DataFrame()
         for _, row in dat.iterrows():
-            value_df = pd.DataFrame(row["value"], index=["end_angle"]).transpose()
+            value_df = pd.DataFrame(row["size_value"], index=["end_angle"]).transpose()
             pctgs = value_df["end_angle"] / value_df["end_angle"].sum()
             value_df = (value_df / value_df.sum()) * 360
             value_df = value_df.cumsum().fillna(0)
@@ -148,11 +149,11 @@ def calculate_positions(
             value_df["x0"] = row["x"]
             value_df["y0"] = row["y"]
             value_df["row_id"] = row["row_id"]
-            value_df["value"] = value_df.index
+            value_df["size_value"] = value_df.index
             value_df["pctgs"] = pctgs
             result = pd.concat([result, value_df])
-        result = result.dropna(subset="value", axis=0)
-        dat = result.merge(dat.drop("value", axis=1), on=["row_id"], how="left")
+        result = result.dropna(subset="size_value", axis=0)
+        dat = result.merge(dat.drop("size_value", axis=1), on=["row_id"], how="left")
         return dat
 
     pie_data = data_processor("pie", pie_fun)
@@ -529,26 +530,27 @@ def calculate_positions(
                     xmax=row["xmax"],
                     ymin=row["ymin"],
                     ymax=row["ymax"],
-                    value=row["value"],
+                    size_value=row["value"],
+                    color_value=np.nan, #TEMP fix
                     midpoint=0.8,
                 )
                 for _, row in fr_legend_dat1[
                     ["xmin", "xmax", "ymin", "ymax", "value"]
-                ].iterrows()
+                ].iterrows() 
             ]
         )
 
         fr_legend_dat2["minx"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: min(col["x"] - col["r"]))
+            fr_legend_dat2.groupby("size_value").apply(lambda col: min(col["x"] - col["r"]))
         ).tolist()
         fr_legend_dat2["maxx"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: max(col["x"] + col["r"]))
+            fr_legend_dat2.groupby("size_value").apply(lambda col: max(col["x"] + col["r"]))
         ).tolist()
         fr_legend_dat2["miny"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: min(col["y"] - col["r"]))
+            fr_legend_dat2.groupby("size_value").apply(lambda col: min(col["y"] - col["r"]))
         ).tolist()
         fr_legend_dat2["maxy"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: max(col["y"] + col["r"]))
+            fr_legend_dat2.groupby("size_value").apply(lambda col: max(col["y"] + col["r"]))
         ).tolist()
         fr_legend_dat2 = fr_legend_dat2.reset_index(drop=True)
         fr_legend_dat2["w"] = fr_legend_dat2["w"].fillna(
@@ -569,7 +571,7 @@ def calculate_positions(
         fr_legend_dat2["x"] = (fr_legend_dat2["xmin"] + fr_legend_dat2["xmax"]) / 2
         fr_legend_dat2["y"] = (fr_legend_dat2["ymin"] + fr_legend_dat2["ymax"]) / 2
         fr_legend_dat2 = fr_legend_dat2[
-            ["x", "y", "value", "xmin", "xmax", "ymin", "ymax", "w", "h", "corner_size"]
+            ["x", "y", "size_value", "xmin", "xmax", "ymin", "ymax", "w", "h", "corner_size"]
         ]
         fr_maximum_x = fr_legend_dat2["xmax"].max()
 
@@ -580,7 +582,7 @@ def calculate_positions(
                 "xmax": fr_legend_dat2["x"] + fr_legend_size / 2,
                 "ymin": fr_legend_dat2["y"] - fr_legend_size / 2,
                 "ymax": fr_legend_dat2["y"] + fr_legend_size / 2,
-                "value": fr_legend_dat2["value"],
+                "value": fr_legend_dat2["size_value"],
             }
         )
 
@@ -591,14 +593,14 @@ def calculate_positions(
                     xmax=row["xmax"],
                     ymin=row["ymin"],
                     ymax=row["ymax"],
-                    value=row["value"],
+                    size_value=row["size_value"],
                     midpoint=0.8,
                 )
                 for _, row in fr_legend_dat2.iterrows()
             ]
         )
         fr_poly_data2["col_value"] = round(
-            fr_poly_data2["value"] * (len(grey_palette) - 1)
+            fr_poly_data2["size_value"] * (len(grey_palette) - 1)
         )
         fr_poly_data2["colour"] = [
             "#444444FF" if np.isnan(col_val) else grey_palette[int(col_val)]
@@ -617,7 +619,7 @@ def calculate_positions(
                 "fontweight": ["bold"],
             }
         )
-        fr_value_data = fr_legend_dat2[fr_legend_dat2["value"] % 0.2 == 0]
+        fr_value_data = fr_legend_dat2[fr_legend_dat2["size_value"] % 0.2 == 0]
         fr_value_data = pd.DataFrame(
             {
                 "ymin": fr_value_data["ymin"] - 1,
@@ -628,7 +630,7 @@ def calculate_positions(
                 "va": 0,
                 "label_value": [
                     round(val, 0) if val in [0, 1] else round(val, 1)
-                    for val in fr_value_data["value"]
+                    for val in fr_value_data["size_value"]
                 ],
             }
         )

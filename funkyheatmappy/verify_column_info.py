@@ -2,14 +2,17 @@ import pandas as pd
 import re
 import numpy as np
 from pandas.api.types import is_string_dtype, is_numeric_dtype, is_dict_like
+from matplotlib.colors import is_color_like
 
 
 def verify_column_info(data, column_info=None):
     if column_info is None:
         column_info = pd.DataFrame(index=data.columns)
-        column_info.index.names = ["id"]
+        column_info["id"] = column_info.index
     if "id" in column_info.columns:
         column_info.index = column_info["id"]
+    else:
+        column_info["id"] = column_info.index # We rquire "id" to be in column_info
     assert isinstance(
         column_info, pd.DataFrame
     ), "column_info must be a pandas dataframe"
@@ -61,6 +64,32 @@ def verify_column_info(data, column_info=None):
     assert all(
         isinstance(s, str) for s in column_info["geom"]
     ), "column_info must have string geoms"
+
+    # checking id_color
+    if "id_colour" in column_info.columns:
+        column_info["id_color"] = column_info["id_colour"]
+        column_info = column_info.drop("id_colour", axis=1)
+    if "id_color" not in column_info.columns:
+        column_info["id_color"] = np.nan
+    assert all(
+        isinstance(s, str) or pd.isna(s) for s in column_info["id_color"]
+    ), "column_info must have id_color"
+    assert all(pd.isna(column_info["id_color"])) | is_color_like(column_info["id_color"]) | all(s in data.columns for s in column_info["id_color"]), "column_info must have id_color"
+
+    column_info.loc[pd.isna(column_info["id_color"]), "id_color"] = column_info["id"] # if nan, replace by id, except if text or image
+    column_info.loc[column_info["geom"] == "text", "id_color"] = np.nan
+    column_info.loc[column_info["geom"] == "image", "id_color"] = np.nan
+
+    # checking id_size
+    if "id_size" not in column_info.columns:
+        column_info["id_size"] = np.nan
+    assert all(isinstance(s, str) or pd.isna(s) for s in column_info["id_size"]), "column_info must have id_size"
+    assert all(pd.isna(column_info["id_size"])) | all(s in data.columns for s in column_info["id_size"]), "column_info must have id_size"
+
+    column_info.loc[pd.isna(column_info["id_size"]), "id_size"] = column_info["id"] # if nan, replace by id, except if text or image
+    column_info.loc[column_info["geom"] == "text", "id_size"] = np.nan
+    column_info.loc[column_info["geom"] == "image", "id_size"] = np.nan
+    column_info.loc[column_info["geom"] == "rect", "id_size"] = np.nan
 
     # checking group
     if "group" not in column_info.columns:

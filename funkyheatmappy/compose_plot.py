@@ -268,5 +268,5 @@ def compose_plot(positions, position_args):
     ax.axis("off")
     # Make sure that the plots are scaled correctly
     fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
-
+    fig.savefig("test.png", dpi=300)
     return fig
