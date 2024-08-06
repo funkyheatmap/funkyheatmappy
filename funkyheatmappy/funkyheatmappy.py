@@ -7,6 +7,10 @@ from .verify_palettes import verify_palettes
 from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 from .position_arguments import position_arguments
+from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend
+
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 
 def funky_heatmap(
@@ -104,6 +108,7 @@ def funky_heatmap(
     )
     row_groups = verify_row_groups(row_info=row_info, row_groups=row_groups)
     palettes = verify_palettes(data=data, column_info=column_info, palettes=palettes)
+    legends = verify_legends(legends, palettes, column_info, data)
 
     positions = calculate_positions(
         data,
@@ -117,4 +122,36 @@ def funky_heatmap(
         add_abc,
     )
 
-    return compose_plot(positions, position_args)
+    # Plot main figure
+    fig = plt.figure(layout = "constrained")
+    gs = GridSpec(2, 1, figure=fig)
+    ax1 = fig.add_subplot(gs[0, 0])
+    fig, ax1 = compose_plot(positions, position_args, fig, ax1)
+
+    # Plot legends
+
+    geom_legends_funs = {
+        "funkyrect": create_funkyrect_legend,
+        "rect": create_rect_legend,
+        "circle": create_circle_legend,
+        "text": create_text_legend,
+    }
+
+    legend_plots = []
+    for legend in legends:
+        legend_fun = geom_legends_funs[legend["geom"]]
+        legend_args = legend
+        legend_args["geom"] = None
+        legend_args["enabled"] = None
+        legend_args["palette"] = None
+        legend_args["position_args"] = position_args
+        legend_plot = legend_fun(**legend_args)
+
+        legend_plots.append(legend_plot)
+
+    ax2 = fig.add_subplot(gs[1, 0])
+    fig, ax2 = compose_plot(positions, position_args, fig, ax2)
+    plt.show()
+
+
+    return fig

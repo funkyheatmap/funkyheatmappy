@@ -8,29 +8,31 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib.transforms import Affine2D
 
 
-def compose_plot(positions, position_args):
-    fig, ax = plt.subplots(layout = "constrained")
+def compose_plot(positions, position_args, fig = None, ax = None):
+    if ax is None:
+        fig, ax = plt.subplots(layout = "constrained")
 
-    # Plot row backgrounds
-    df = positions["row_pos"]
-    df = df[df["color_background"]]
+    if "row_pos" in positions:
+        # Plot row backgrounds
+        df = positions["row_pos"]
+        df = df[df["color_background"]]
 
-    if df.shape[0] > 0:
-        for _, row in df.iterrows():
-            rect = Rectangle(
-                xy=(
-                    np.min(positions["column_pos"]["xmin"]) - 0.25,
-                    row["ymin"] - (positions["viz_params"] / 2),
-                ),
-                width=np.max(positions["column_pos"]["xmax"]) + 0.25,
-                height=row["height"],
-                color="#DDDDDD",
-                zorder=0,
-            )
-            ax.add_patch(rect)
+        if df.shape[0] > 0:
+            for _, row in df.iterrows():
+                rect = Rectangle(
+                    xy=(
+                        np.min(positions["column_pos"]["xmin"]) - 0.25,
+                        row["ymin"] - (positions["viz_params"] / 2),
+                    ),
+                    width=np.max(positions["column_pos"]["xmax"]) + 0.25,
+                    height=row["height"],
+                    color="#DDDDDD",
+                    zorder=0,
+                )
+                ax.add_patch(rect)
 
     # Plot segments
-    if positions["segment_data"].shape[0] > 0:
+    if "segment_data" in positions and positions["segment_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["segment_data"], size=0.5, colour="black", linestyle="solid"
         )
@@ -45,7 +47,7 @@ def compose_plot(positions, position_args):
         ax.add_collection(lc)
 
     # Plot rectangles
-    if positions["rect_data"].shape[0] > 0:
+    if "rect_data" in positions and positions["rect_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["rect_data"], border_colour="black", border=True, alpha=1
         )
@@ -69,7 +71,7 @@ def compose_plot(positions, position_args):
             ax.add_patch(rect)
 
     # Plot circles
-    if positions["circle_data"].shape[0] > 0:
+    if "circle_data" in positions and positions["circle_data"].shape[0] > 0:
         for _, row in positions["circle_data"].iterrows():
             circle = Circle(
                 xy=(row["x"], row["y"]),
@@ -82,7 +84,7 @@ def compose_plot(positions, position_args):
             ax.add_patch(circle)
 
     # Plot funky rectangles
-    if positions["funkyrect_data"].shape[0] > 0:
+    if "funky_rect" in positions and positions["funkyrect_data"].shape[0] > 0:
         for _, row in positions["funkyrect_data"].iterrows():
             funkyrect = FancyBboxPatch(
                 (row["x"] - row["w"] / 2, row["y"] - row["h"] / 2),
@@ -97,7 +99,7 @@ def compose_plot(positions, position_args):
             ax.add_patch(funkyrect)
 
     # Plot pies
-    if positions["pie_data"].shape[0] > 0:
+    if "pie_data"in positions and positions["pie_data"].shape[0] > 0:
         for _, row in positions["pie_data"].iterrows():
             start_angle = row["start_angle"]
             end_angle = row["end_angle"]
@@ -116,7 +118,7 @@ def compose_plot(positions, position_args):
             ax.add_patch(pies)
 
     # Plot images
-    if positions["image_data"].shape[0] > 0:
+    if "image_data" in positions and positions["image_data"].shape[0] > 0:
         for _, row in positions["image_data"].iterrows():
             arr_img = plt.imread(
                 row["path"] + "/" + row["value"] + "." + row["filetype"]
@@ -124,7 +126,7 @@ def compose_plot(positions, position_args):
             ax.imshow(arr_img, extent=(row["xmin"], row["xmax"], row["ymin"], row["ymax"]))
 
     # Plot text
-    if positions["text_data"].shape[0] > 0:
+    if "text_data" in positions and positions["text_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["text_data"],
             ha=0.5,
@@ -267,6 +269,6 @@ def compose_plot(positions, position_args):
     ax.axis("scaled")
     ax.axis("off")
     # Make sure that the plots are scaled correctly
-    fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
+    # fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
 
-    return fig
+    return fig, ax
