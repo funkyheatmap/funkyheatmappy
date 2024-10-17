@@ -167,7 +167,9 @@ def dynbenchmark_data():
 
 class Testfunkyheatmappy(object):
     def test_mtcars(self, mtcars):
-        funkyheatmappy.funky_heatmap(mtcars["data"])
+        res = funkyheatmappy.funky_heatmap(mtcars["data"])
+
+        thing = 0
 
 
     def test_mtcars_extended(self, mtcars):
@@ -216,7 +218,7 @@ class Testfunkyheatmappy(object):
 
 
     def test_dynbenchmark(self, dynbenchmark_data):
-        funkyheatmappy.funky_heatmap(
+        res = funkyheatmappy.funky_heatmap(
             data=dynbenchmark_data["data"],
             column_info=dynbenchmark_data["column_info"],
             column_groups=dynbenchmark_data["column_groups"],
@@ -225,6 +227,7 @@ class Testfunkyheatmappy(object):
             palettes=dynbenchmark_data["palettes"],
             position_args=position_arguments(col_annot_offset=4.2),
         )
+        thing = 0
 
 
     def test_position_arguments(self, dynbenchmark_data):
