@@ -167,7 +167,9 @@ def dynbenchmark_data():
 
 class Testfunkyheatmappy(object):
     def test_mtcars(self, mtcars):
-        funkyheatmappy.funky_heatmap(mtcars["data"])
+        res = funkyheatmappy.funky_heatmap(mtcars["data"])
+
+        thing = 0
 
 
     def test_mtcars_extended(self, mtcars):

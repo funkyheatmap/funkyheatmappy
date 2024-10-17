@@ -4,6 +4,7 @@ from .verify_row_info import verify_row_info
 from .verify_column_groups import verify_column_groups
 from .verify_row_groups import verify_row_groups
 from .verify_palettes import verify_palettes
+from .verify_legends import verify_legends
 from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 from .position_arguments import position_arguments
@@ -20,6 +21,7 @@ def funky_heatmap(
     column_groups=None,
     row_groups=None,
     palettes=None,
+    legends=None,
     position_args=position_arguments(),
     scale_column=True,
     add_abc=True,
@@ -151,7 +153,8 @@ def funky_heatmap(
 
     ax2 = fig.add_subplot(gs[1, 0])
     fig, ax2 = compose_plot(positions, position_args, fig, ax2)
-    plt.show()
+    
+    fig.savefig("test_funky_heatmap.png")
 
 
     return fig

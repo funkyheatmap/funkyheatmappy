@@ -76,7 +76,7 @@ def verify_single_legend(legend, palettes, column_info):
         print(f"Legend {legend} did not contain labels, inferring from the geom.")
         
         if legend["geom"] == "pie" and "palette" in legend:
-            legend["labels"] = palettes[legend["palette"]].keys()
+            legend["labels"] = list(palettes[legend["palette"]].keys())
         elif legend["geom"] in ["circle", "rect", "funkyrect"]:
             legend["labels"] = ["0", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1"]
         elif legend["geom"] == "text":
@@ -84,17 +84,17 @@ def verify_single_legend(legend, palettes, column_info):
             legend["enabled"] = False
             return legend
         # assert that it is a list of strings
-    assert isinstance(legend["labels"], list), "labels must be a list"
+    assert isinstance(legend["labels"], list), f"labels must be a list, is now {legend['labels']}"
     assert all(isinstance(s, str) for s in legend["labels"]), "labels must be strings"
 
     # check size
     if legend["geom"] in ["circle", "rect", "funkyrect", "text"]:
         if "size" not in legend:
             if legend["geom"] == "text":
-                legend["size"] = 3.88
+                legend["size"] = [3.88]
             else:
                 print(f"Legend {legend} did not contain size, inferring from the labels.")
-                legend["size"] = np.linspace(0, 1, len(legend["labels"]))
+                legend["size"] = np.linspace(0, 1, len(legend["labels"])).tolist()
 
         assert isinstance(legend["size"], list), "size must be a list"
         assert all(isinstance(s, (int, float)) for s in legend["size"]), "size must be a list of numbers"
@@ -112,14 +112,15 @@ def verify_single_legend(legend, palettes, column_info):
     if "color" not in legend:
         if "palette" in legend:
             print(f"Legend {legend} did not contain color, inferring from the palette.")
-            colors = palettes[legend["palette"]].values()
-            legend["color"] = colors[round(np.linspace(0, len(colors), len(legend["labels"])))]
+            colors = palettes[legend["palette"]]
+            indices = [int(x) for x in np.linspace(0, len(colors), len(legend["labels"]), endpoint=False)] # int rounds down
+            legend["color"] = [colors[i] for i in indices]
         elif legend["geom"] == "text":
             legend["color"] = "black"
     # assert list of strings
     # assert length is the same as labels or 1
     assert isinstance(legend["color"], list), "color must be a list"
-    assert all(isinstance(s, str) for s in legend["color"]), "color must be a list of strings"
+    # assert all(isinstance(s, str) for s in legend["color"]), "color must be a list of strings"
     assert len(legend["color"]) == 1 or len(legend["color"]) == len(legend["labels"]), "color must be the same length as labels or 1"
 
     # check hjust
@@ -133,8 +134,10 @@ def verify_single_legend(legend, palettes, column_info):
         # assert list of int or float
         # assert lenght is the same as labels or 1
         assert isinstance(legend["label_hjust"], (int, float, list)), "label_hjust must be a number"
-        assert len(legend["label_hjust"]) == 1 or len(legend["label_hjust"]) == len(legend["labels"]), "label_hjust must be the same length as labels or 1"
+        assert isinstance(legend["label_hjust"], (int, float)) or len(legend["label_hjust"]) == 1 or len(legend["label_hjust"]) == len(legend["labels"]), "label_hjust must be the same length as labels or 1"
 
+        if isinstance(legend["label_hjust"], (int, float)):
+            legend["label_hjust"] = [legend["label_hjust"]]
         if len(legend["label_hjust"]) == 1:
             legend["label_hjust"] = [legend["label_hjust"][0]] * len(legend["labels"])
 
@@ -148,8 +151,7 @@ def verify_single_legend(legend, palettes, column_info):
             legend["label_width"] = None
         
     if "label_width" in legend:
-        assert isinstance(legend["label_width"], (int, float)), "label_width must be a number"
-        assert len(legend["label_width"]) == 1, "label_width must be a single number"
+        assert legend["label_width"] is None or isinstance(legend["label_width"], (int, float)), "label_width must be a single number"
 
     # check value_width
     if "value_width" not in legend:
@@ -159,7 +161,6 @@ def verify_single_legend(legend, palettes, column_info):
             legend["value_width"] = None
     
     if "value_width" in legend:
-        assert isinstance(legend["value_width"], (int, float)), "value_width must be a number"
-        assert len(legend["value_width"]) == 1, "value_width must be a single number"
+        assert legend["value_width"] is None or isinstance(legend["value_width"], (int, float)), "value_width must be a number"
     
     return legend

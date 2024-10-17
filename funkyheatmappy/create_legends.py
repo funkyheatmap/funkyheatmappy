@@ -45,10 +45,10 @@ def create_generic_geom_legend(title, geom, labels, size, color, position_args, 
     legend_data = pd.DataFrame(data = {
         "size_value": size,
         "color_value": color,
-        "xmin": - size * legend_size / 2,
-        "xmax": size * legend_size / 2,
-        "ymin": - size * legend_size / 2,
-        "ymax": size * legend_size / 2,
+        "xmin": [x * -1 * legend_size / 2 for x in size],
+        "xmax": [x * legend_size / 2 for x in size],
+        "ymin": [x * -1 * legend_size / 2 for x in size],
+        "ymax": [x * legend_size / 2 for x in size],
         "label": labels,
         "color": color,
         "size": size,
@@ -108,16 +108,16 @@ def create_generic_geom_legend(title, geom, labels, size, color, position_args, 
     return fig
 
 
-def create_funkyrect_legend(title, labels, size, color, position_args, label_hjust = .5):
+def create_funkyrect_legend(title, labels, size, color, position_args, label_hjust = .5, **kwargs):
     return create_generic_geom_legend(title, "funkyrect", labels, size, color, position_args, label_hjust)
 
-def create_rect_legend(title, labels, size, color, position_args, label_hjust = .5):
+def create_rect_legend(title, labels, size, color, position_args, label_hjust = .5, **kwargs):
     return create_generic_geom_legend(title, "rect", labels, size, color, position_args, label_hjust)
 
-def create_circle_legend(title, labels, size, color, position_args, label_hjust = .5):
+def create_circle_legend(title, labels, size, color, position_args, label_hjust = .5, **kwargs):
     return create_generic_geom_legend(title, "circle", labels, size, color, position_args, label_hjust)
 
-def create_text_legend(title, labels, size, color, values, position_args, label_width = 1, value_width = 2):
+def create_text_legend(title, labels, size, color, values, position_args, label_width = 1, value_width = 2, **kwargs):
     start_x = 0
     start_y = 0
     row_height = position_args["row_height"]
