@@ -124,37 +124,68 @@ def funky_heatmap(
         add_abc,
     )
 
+    nr_legends = sum([legend["enabled"] for legend in legends])
+    heights = [data.shape[0], 1]
+        # Add size
+    minimum_x = (
+        positions["bounds"]["minimum_x"] - position_args["expand_xmin"]
+        if "expand_xmin" in position_args.keys()
+        else 0
+    )
+    maximum_x = (
+        positions["bounds"]["maximum_x"] + position_args["expand_xmax"]
+        if "expand_xmax" in position_args.keys()
+        else 0
+    )
+    minimum_y = (
+        positions["bounds"]["minimum_y"] - position_args["expand_ymin"]
+        if "expand_ymin" in position_args.keys()
+        else 0
+    )
+    maximum_y = (
+        positions["bounds"]["maximum_y"] + position_args["expand_ymax"]
+        if "expand_ymax" in position_args.keys()
+        else 0
+    )
+
     # Plot main figure
-    fig = plt.figure(layout = "constrained")
-    gs = GridSpec(2, 1, figure=fig)
-    ax1 = fig.add_subplot(gs[0, 0])
+    fig = plt.figure(layout = "constrained", figsize = (8, 32))
+    fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
+    gs = GridSpec(2, nr_legends, figure=fig, height_ratios=heights)
+    ax1 = fig.add_subplot(gs[0, :])
     fig, ax1 = compose_plot(positions, position_args, fig, ax1)
 
     # Plot legends
 
+    # TODO pie legends
+    # TODO text legends
+    # TODO bar legends
     geom_legends_funs = {
         "funkyrect": create_funkyrect_legend,
         "rect": create_rect_legend,
         "circle": create_circle_legend,
-        "text": create_text_legend,
+        "pie": create_pie_legend,
+        # "text": create_text_legend,
     }
 
+    current_subplot = 0
     legend_plots = []
     for legend in legends:
-        legend_fun = geom_legends_funs[legend["geom"]]
-        legend_args = legend
-        legend_args["geom"] = None
-        legend_args["enabled"] = None
-        legend_args["palette"] = None
-        legend_args["position_args"] = position_args
-        legend_plot = legend_fun(**legend_args)
+        if legend["geom"] in geom_legends_funs.keys():
+            ax2 = fig.add_subplot(gs[1, current_subplot])
+            current_subplot += 1
 
-        legend_plots.append(legend_plot)
+            legend_fun = geom_legends_funs[legend["geom"]]
+            legend_args = legend
+            legend_args["position_args"] = position_args
+            legend_plot = legend_fun(**legend_args, ax = ax2)
 
-    ax2 = fig.add_subplot(gs[1, 0])
-    fig, ax2 = compose_plot(positions, position_args, fig, ax2)
+            legend_plots.append(legend_plot)
+
+
+    # fig, ax2 = compose_plot(positions, position_args, fig, ax2)
     
-    fig.savefig("test_funky_heatmap.png")
+    fig.savefig("test_funky_heatmap2.png")
 
 
     return fig

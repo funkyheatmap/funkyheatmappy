@@ -101,8 +101,8 @@ def verify_single_legend(legend, palettes, column_info):
         # assert that it is the same length as labels or 1
         assert len(legend["size"]) == 1 or len(legend["size"]) == len(legend["labels"]), "size must be the same length as labels or 1"
 
-    if len(legend["size"]) == 1:
-        legend["size"] = [legend["size"][0]] * len(legend["labels"])
+        if len(legend["size"]) == 1:
+            legend["size"] = [legend["size"][0]] * len(legend["labels"])
 
     # check color
     if "colour" in legend:
@@ -113,8 +113,13 @@ def verify_single_legend(legend, palettes, column_info):
         if "palette" in legend:
             print(f"Legend {legend} did not contain color, inferring from the palette.")
             colors = palettes[legend["palette"]]
-            indices = [int(x) for x in np.linspace(0, len(colors), len(legend["labels"]), endpoint=False)] # int rounds down
-            legend["color"] = [colors[i] for i in indices]
+            
+            # list or dict?
+            if isinstance(colors, dict):
+                legend["color"] = [colors[i] for i in legend["labels"]]
+            else:
+                indices = [int(x) for x in np.linspace(0, len(colors), len(legend["labels"]), endpoint=False)] # int rounds down
+                legend["color"] = [colors[i] for i in indices]
         elif legend["geom"] == "text":
             legend["color"] = "black"
     # assert list of strings
@@ -130,7 +135,7 @@ def verify_single_legend(legend, palettes, column_info):
         else:
             legend["label_hjust"] = None
     
-    if "label_hjust" in legend:
+    if "label_hjust" in legend and legend["label_hjust"] is not None:
         # assert list of int or float
         # assert lenght is the same as labels or 1
         assert isinstance(legend["label_hjust"], (int, float, list)), "label_hjust must be a number"

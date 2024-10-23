@@ -1,41 +1,46 @@
-from .compose_plot import compose_plot
+# from funkyheatmappy.score_to_funkyrectangle import score_to_funky_rectangle
+from funkyheatmappy.compose_plot import compose_plot
 
 import pandas as pd
+import numpy as np
 
-def score_to_funky_rectangle(row):
+def score_to_funky_rectangle(row):#xmin, xmax, ymin, ymax, size_value, midpoint=0.5, name=None):
     xmin = row["xmin"]
     xmax = row["xmax"]
     ymin = row["ymin"]
     ymax = row["ymax"]
     size_value = row["size_value"]
 
-    midpoint = 0.8
+    midpoint = 0.5
 
-    if size_value == None:
+    if size_value is None:
         return None
-    
+
     if size_value >= midpoint:
-        # transform value to 0.5 .. 1.0 range
         trans = (size_value - midpoint) / (1 - midpoint) / 2 + 0.5
-        row["corner_size"] = (0.9 - 0.8 * trans) * min(xmax - xmin, ymax - ymin)
-    
+        corner_size = (0.9 - 0.8 * trans) * min(xmax - xmin, ymax - ymin)
+
+        row["corner_size"] = corner_size
+
     else:
+        trans = size_value / midpoint / 2
+        start = 0
+        end = 2 * np.pi
         x = xmin / 2 + xmax / 2
         y = ymin / 2 + ymax / 2
-        row["corner_size"] = 0.5
+        r = (trans * 0.9 + 0.1) * min(xmax - xmin, ymax - ymin)
 
-        trans = size_value / midpoint
-
-        width = (trans * 0.9 + 0.1) * min(xmax - xmin, ymax - ymin)
-        row["xmin"] = x - width / 2
-        row["xmax"] = x + width / 2
-        row["ymin"] = y - width / 2
-        row["ymax"] = y + width / 2
+        row["trans"] = trans
+        row["start"] = start
+        row["end"] = end
+        row["x"] = x
+        row["y"] = y
+        row["r"] = r
     
     return row
 
 
-def create_generic_geom_legend(title, geom, labels, size, color, position_args, label_hjust):
+def create_generic_geom_legend(title, geom, labels, size, color, position_args, label_hjust, ax = None):
     start_x = 0
     start_y = 0
 
@@ -50,20 +55,23 @@ def create_generic_geom_legend(title, geom, labels, size, color, position_args, 
         "ymin": [x * -1 * legend_size / 2 for x in size],
         "ymax": [x * legend_size / 2 for x in size],
         "label": labels,
-        "color": color,
+        "colour": color,
         "size": size,
         "label_hjust": label_hjust
     })
 
     if geom == "funkyrect":
         legend_data = legend_data.apply(score_to_funky_rectangle, axis=1)
+        # legend_data = legend_data.apply(score_to_funky_rectangle, axis=1)
     elif geom == "circle":
         legend_data["r"] = legend_data["size"] / 2
 
     geom_data = legend_data.copy()
 
     geom_data["width"] = geom_data["xmax"] - geom_data["xmin"]
+    geom_data["w"] = geom_data["width"]
     geom_data["height"] = geom_data["ymax"] - geom_data["ymin"]
+    geom_data["h"] = geom_data["height"]
     geom_data["xmin"] = (geom_data["width"] + legend_space).cumsum() - geom_data["width"] - legend_space
     geom_data["xmin"] = start_x + geom_data["xmin"] - min(geom_data["xmin"])
     geom_data["xmax"] = geom_data["xmin"] + geom_data["width"]
@@ -91,7 +99,11 @@ def create_generic_geom_legend(title, geom, labels, size, color, position_args, 
     necessary_geom_data["ymin"] = necessary_geom_data["ymin"] - 1
     necessary_geom_data["hjust"] = geom_data["label_hjust"]
     necessary_geom_data["vjust"] = 0
+    necessary_geom_data["ha"] = necessary_geom_data["hjust"]
+    necessary_geom_data["va"] = necessary_geom_data["vjust"]
     necessary_geom_data["label_value"] = geom_data["label"]
+    necessary_geom_data["w"] = geom_data["width"]
+    necessary_geom_data["h"] = geom_data["height"]
 
     text_data = pd.concat([title_data, necessary_geom_data], axis=0)
     text_data["x"] = (1 - text_data["hjust"]) * text_data["xmin"] + text_data["hjust"] * text_data["xmax"]
@@ -103,21 +115,22 @@ def create_generic_geom_legend(title, geom, labels, size, color, position_args, 
     }
 
     # return compose_plot(geom_positions, [])
-    fig, ax2 = compose_plot(geom_positions, {})
-    fig.savefig("legend.png")
-    return fig
+    fig, ax2 = compose_plot(geom_positions, {}, ax = ax)
+    # fig, ax2 = compose_plot(geom_positions, {})
+    # fig.savefig("legend.png")
+    return geom_positions
 
 
-def create_funkyrect_legend(title, labels, size, color, position_args, label_hjust = .5, **kwargs):
-    return create_generic_geom_legend(title, "funkyrect", labels, size, color, position_args, label_hjust)
+def create_funkyrect_legend(title, labels, size, color, position_args, label_hjust = .5, ax = None, **kwargs):
+    return create_generic_geom_legend(title, "funkyrect", labels, size, color, position_args, label_hjust, ax = ax)
 
-def create_rect_legend(title, labels, size, color, position_args, label_hjust = .5, **kwargs):
-    return create_generic_geom_legend(title, "rect", labels, size, color, position_args, label_hjust)
+def create_rect_legend(title, labels, size, color, position_args, label_hjust = .5, ax = None, **kwargs):
+    return create_generic_geom_legend(title, "rect", labels, size, color, position_args, label_hjust, ax = ax)
 
-def create_circle_legend(title, labels, size, color, position_args, label_hjust = .5, **kwargs):
-    return create_generic_geom_legend(title, "circle", labels, size, color, position_args, label_hjust)
+def create_circle_legend(title, labels, size, color, position_args, label_hjust = .5, ax = None, **kwargs):
+    return create_generic_geom_legend(title, "circle", labels, size, color, position_args, label_hjust, ax = ax)
 
-def create_text_legend(title, labels, size, color, values, position_args, label_width = 1, value_width = 2, **kwargs):
+def create_text_legend(title, labels, size, color, values, position_args, label_width = 1, value_width = 2, ax = None, **kwargs):
     start_x = 0
     start_y = 0
     row_height = position_args["row_height"]
@@ -170,6 +183,7 @@ def create_text_legend(title, labels, size, color, values, position_args, label_
     fig, ax2 = compose_plot(geom_positions, {})
     return fig
 
+# def create_pie_legend(title, labels, size, color, position_args, ax = None, **kwargs):
 
 
 

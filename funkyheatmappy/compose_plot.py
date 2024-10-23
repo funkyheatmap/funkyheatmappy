@@ -4,8 +4,6 @@ import pandas as pd
 from funkyheatmappy.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
 from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from matplotlib.transforms import Affine2D
 
 
 def compose_plot(positions, position_args, fig = None, ax = None):
@@ -84,19 +82,31 @@ def compose_plot(positions, position_args, fig = None, ax = None):
             ax.add_patch(circle)
 
     # Plot funky rectangles
-    if "funky_rect" in positions and positions["funkyrect_data"].shape[0] > 0:
+    if "funkyrect_data" in positions and positions["funkyrect_data"].shape[0] > 0:
         for _, row in positions["funkyrect_data"].iterrows():
-            funkyrect = FancyBboxPatch(
-                (row["x"] - row["w"] / 2, row["y"] - row["h"] / 2),
-                row["w"],
-                row["h"],
-                boxstyle=f"round, pad = 0, rounding_size={row['corner_size']}",
-                fc=row["colour"],
-                ec="black",
-                lw=0.5,
-                zorder=2,
-            )
-            ax.add_patch(funkyrect)
+            # check whether to draw a funkyrect or a circle
+            if row["start"] is not None and row["start"] < 1e-10 and 2 * np.pi - 1e-10 < row["end"]:
+                circle = Circle(
+                    xy=(row["x"], row["y"]),
+                    radius=row["r"],
+                    ec="black",
+                    lw=0.5,
+                    fc=row["colour"],
+                    zorder=2,
+                )
+                ax.add_patch(circle)
+            else:
+                funkyrect = FancyBboxPatch(
+                    (row["xmin"], row["ymin"]),
+                    row["xmax"] - row["xmin"],
+                    row["ymax"] - row["ymin"],
+                    boxstyle=f"round, pad = 0, rounding_size={row['corner_size']}",
+                    fc=row["colour"],
+                    ec="black",
+                    lw=0.5,
+                    zorder=2,
+                )
+                ax.add_patch(funkyrect)
 
     # Plot pies
     if "pie_data"in positions and positions["pie_data"].shape[0] > 0:
@@ -202,6 +212,7 @@ def compose_plot(positions, position_args, fig = None, ax = None):
                 ),
             ),
         )
+        # legends do this themselves
         df = df.assign(
             x=np.add(
                 np.multiply((np.subtract(1, df["alphax"])), df["xmin"]),

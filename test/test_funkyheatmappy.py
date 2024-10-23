@@ -155,6 +155,17 @@ def dynbenchmark_data():
         }
     }
     palettes["colours"][5] = dict(zip(names_error_r, palettes["colours"][5]))
+
+    legends = [
+        {'title': "stability", 'palette': 'stability', 'enabled': True, 'geom': 'funkyrect'},
+        {'title': "scaling", 'palette': 'scaling', 'enabled': True, 'geom': 'rect'},
+        {'title': "benchmark", 'palette': 'benchmark', 'enabled': True, 'geom': 'funkyrect'},
+        {'title': "qc", 'palette': 'qc', 'enabled': True, 'geom': 'funkyrect'},
+        # {'title': "error_reasons", 'palette': 'error_reasons', 'enabled': True, 'geom': 'pie',
+        #  'colors': ['#8DD3C7', '#FFFFB3', '#BEBADA', '#FB8072'],
+        #  'labels': ['Memory limit exceeded', 'Time limit exceeded', 'Execution error', 'Method error']},
+    ]
+
     return {
         "data": data,
         "column_groups": column_groups,
@@ -162,6 +173,7 @@ def dynbenchmark_data():
         "row_groups": row_groups,
         "row_info": row_info,
         "palettes": palettes,
+        "legends": legends
     }
 
 
@@ -226,6 +238,7 @@ class Testfunkyheatmappy(object):
             row_groups=dynbenchmark_data["row_groups"],
             palettes=dynbenchmark_data["palettes"],
             position_args=position_arguments(col_annot_offset=4.2),
+            legends=dynbenchmark_data["legends"]
         )
         thing = 0
 
