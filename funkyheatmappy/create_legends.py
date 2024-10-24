@@ -183,7 +183,85 @@ def create_text_legend(title, labels, size, color, values, position_args, label_
     fig, ax2 = compose_plot(geom_positions, {})
     return fig
 
-# def create_pie_legend(title, labels, size, color, position_args, ax = None, **kwargs):
+def create_pie_legend(title, labels, color, position_args, label_width = 2, ax = None, **kwargs):
+    # we need pie title data
+    # we need pie data
+    # we need text data
+    # we need segment data
 
+    start_x = 0
+    start_y = 0
+    row_height = position_args["row_height"]
+
+    legend_data = pd.DataFrame(data = {
+        "name": labels,
+        "fill": color
+    })
+
+    r = np.append(np.arange(90, -90, -(180 / len(labels))), [-90])
+    angles = [i if i >= 0 else i + 360 for i in r]
+
+    legend_data["start_angle"] = angles[1:len(labels) + 1]
+    legend_data["end_angle"] = angles[0:len(labels)]
+    legend_data["rad_start"] = np.linspace(0, np.pi, len(labels) + 1)[:-1]
+    legend_data["rad_end"] = np.linspace(0, np.pi, len(labels) + 1)[1:]
+    legend_data["rad"] = (legend_data["rad_start"] + legend_data["rad_end"]) / 2
+    legend_data["color"] = "black"
+    legend_data["labx"] = row_height * np.sin(legend_data["rad"])
+    begin = row_height * np.cos(legend_data["rad"]).min() #- 0.4
+    end = row_height * np.cos(legend_data["rad"]).max() #+ 0.4
+    legend_data["laby"] = np.linspace(begin, end, len(labels))
+    legend_data["ha"] = 0
+    legend_data["va"] = 0.5
+    legend_data["xpt"] = row_height * np.sin(legend_data["rad"])
+    legend_data["ypt"] = row_height * np.cos(legend_data["rad"])
+
+    # legen_pos = position_args["col_annot_offset"]
+    title_data = pd.DataFrame(data = {
+        "xmin": start_x,
+        "xmax": start_x,
+        "ymin": start_y - 1.5,
+        "ymax": start_y - 0.5,
+        "label_value": title,
+        "ha": 0,
+        "va": 1,
+        "fontweight": "bold"
+    }, index=["pie_title"])
+
+    pie_data = pd.DataFrame(data = {
+        "x0": start_x,
+        "y0": start_y - 2.75,
+        "height": row_height * 0.75,
+        "start_angle": legend_data["start_angle"],
+        "end_angle": legend_data["end_angle"],
+        "colour": legend_data["fill"]
+    })
+
+    text_data = pd.DataFrame(data = {
+        "xmin": start_x + 0.5 + legend_data["labx"],
+        "xmax": start_x + 0.5 + legend_data["labx"],
+        "ymin": start_y - 2.75 + legend_data["laby"] - 0.4,
+        "ymax": start_y - 2.75 + legend_data["laby"] + 0.4,
+        "label_value": legend_data["name"],
+        "ha": legend_data["ha"],
+        "va": legend_data["va"],
+        "colour": legend_data["color"]
+    })
+
+    segment_data = pd.DataFrame(data = {
+        "x": start_x + legend_data["xpt"] * 0.85,
+        "xend": start_x + legend_data["xpt"] * 1.1,
+        "y": start_y - 2.75 + legend_data["ypt"] * 0.85,
+        "yend": start_y - 2.75 + legend_data["ypt"] * 1.1,
+    })
+
+    geom_positions = {
+        "text_data": pd.concat([title_data, text_data]),
+        "pie_data": pie_data,
+        "segment_data": segment_data
+    }
+
+    fig, ax2 = compose_plot(geom_positions, {}, ax = ax)
+    return fig
 
 

@@ -8,7 +8,7 @@ from .verify_legends import verify_legends
 from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 from .position_arguments import position_arguments
-from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend
+from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend, create_pie_legend
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
