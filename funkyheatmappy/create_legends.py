@@ -207,10 +207,10 @@ def create_pie_legend(title, labels, color, position_args, label_width = 2, ax =
     legend_data["rad_end"] = np.linspace(0, np.pi, len(labels) + 1)[1:]
     legend_data["rad"] = (legend_data["rad_start"] + legend_data["rad_end"]) / 2
     legend_data["color"] = "black"
-    legend_data["labx"] = row_height * np.sin(legend_data["rad"])
+    legend_data["labx"] = row_height * np.sin(legend_data["rad"][::-1])
     begin = row_height * np.cos(legend_data["rad"]).min() #- 0.4
     end = row_height * np.cos(legend_data["rad"]).max() #+ 0.4
-    legend_data["laby"] = np.linspace(begin, end, len(labels))
+    legend_data["laby"] = np.linspace(end, begin, len(labels))
     legend_data["ha"] = 0
     legend_data["va"] = 0.5
     legend_data["xpt"] = row_height * np.sin(legend_data["rad"])
@@ -245,7 +245,7 @@ def create_pie_legend(title, labels, color, position_args, label_width = 2, ax =
         "label_value": legend_data["name"],
         "ha": legend_data["ha"],
         "va": legend_data["va"],
-        "colour": legend_data["color"]
+        "colour": legend_data["fill"] #todo return to black
     })
 
     segment_data = pd.DataFrame(data = {

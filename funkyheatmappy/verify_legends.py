@@ -109,7 +109,7 @@ def verify_single_legend(legend, palettes, column_info):
         legend["color"] = legend["colour"]
         del legend["colour"]
     
-    if "color" not in legend:
+    if "colour" not in legend:
         if "palette" in legend:
             print(f"Legend {legend} did not contain color, inferring from the palette.")
             colors = palettes[legend["palette"]]
