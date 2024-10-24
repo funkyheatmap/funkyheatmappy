@@ -4,33 +4,33 @@ import pandas as pd
 from funkyheatmappy.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
 from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from matplotlib.transforms import Affine2D
 
 
-def compose_plot(positions, position_args):
-    fig, ax = plt.subplots(layout = "constrained")
+def compose_plot(positions, position_args, fig = None, ax = None):
+    if ax is None:
+        fig, ax = plt.subplots(layout = "constrained")
 
-    # Plot row backgrounds
-    df = positions["row_pos"]
-    df = df[df["color_background"]]
+    if "row_pos" in positions:
+        # Plot row backgrounds
+        df = positions["row_pos"]
+        df = df[df["color_background"]]
 
-    if df.shape[0] > 0:
-        for _, row in df.iterrows():
-            rect = Rectangle(
-                xy=(
-                    np.min(positions["column_pos"]["xmin"]) - 0.25,
-                    row["ymin"] - (positions["viz_params"] / 2),
-                ),
-                width=np.max(positions["column_pos"]["xmax"]) + 0.25,
-                height=row["height"],
-                color="#DDDDDD",
-                zorder=0,
-            )
-            ax.add_patch(rect)
+        if df.shape[0] > 0:
+            for _, row in df.iterrows():
+                rect = Rectangle(
+                    xy=(
+                        np.min(positions["column_pos"]["xmin"]) - 0.25,
+                        row["ymin"] - (positions["viz_params"] / 2),
+                    ),
+                    width=np.max(positions["column_pos"]["xmax"]) + 0.25,
+                    height=row["height"],
+                    color="#DDDDDD",
+                    zorder=0,
+                )
+                ax.add_patch(rect)
 
     # Plot segments
-    if positions["segment_data"].shape[0] > 0:
+    if "segment_data" in positions and positions["segment_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["segment_data"], size=0.5, colour="black", linestyle="solid"
         )
@@ -45,7 +45,7 @@ def compose_plot(positions, position_args):
         ax.add_collection(lc)
 
     # Plot rectangles
-    if positions["rect_data"].shape[0] > 0:
+    if "rect_data" in positions and positions["rect_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["rect_data"], border_colour="black", border=True, alpha=1
         )
@@ -69,7 +69,7 @@ def compose_plot(positions, position_args):
             ax.add_patch(rect)
 
     # Plot circles
-    if positions["circle_data"].shape[0] > 0:
+    if "circle_data" in positions and positions["circle_data"].shape[0] > 0:
         for _, row in positions["circle_data"].iterrows():
             circle = Circle(
                 xy=(row["x"], row["y"]),
@@ -82,22 +82,34 @@ def compose_plot(positions, position_args):
             ax.add_patch(circle)
 
     # Plot funky rectangles
-    if positions["funkyrect_data"].shape[0] > 0:
+    if "funkyrect_data" in positions and positions["funkyrect_data"].shape[0] > 0:
         for _, row in positions["funkyrect_data"].iterrows():
-            funkyrect = FancyBboxPatch(
-                (row["x"] - row["w"] / 2, row["y"] - row["h"] / 2),
-                row["w"],
-                row["h"],
-                boxstyle=f"round, pad = 0, rounding_size={row['corner_size']}",
-                fc=row["colour"],
-                ec="black",
-                lw=0.5,
-                zorder=2,
-            )
-            ax.add_patch(funkyrect)
+            # check whether to draw a funkyrect or a circle
+            if row["start"] is not None and row["start"] < 1e-10 and 2 * np.pi - 1e-10 < row["end"]:
+                circle = Circle(
+                    xy=(row["x"], row["y"]),
+                    radius=row["r"],
+                    ec="black",
+                    lw=0.5,
+                    fc=row["colour"],
+                    zorder=2,
+                )
+                ax.add_patch(circle)
+            else:
+                funkyrect = FancyBboxPatch(
+                    (row["xmin"], row["ymin"]),
+                    row["xmax"] - row["xmin"],
+                    row["ymax"] - row["ymin"],
+                    boxstyle=f"round, pad = 0, rounding_size={row['corner_size']}",
+                    fc=row["colour"],
+                    ec="black",
+                    lw=0.5,
+                    zorder=2,
+                )
+                ax.add_patch(funkyrect)
 
     # Plot pies
-    if positions["pie_data"].shape[0] > 0:
+    if "pie_data"in positions and positions["pie_data"].shape[0] > 0:
         for _, row in positions["pie_data"].iterrows():
             start_angle = row["start_angle"]
             end_angle = row["end_angle"]
@@ -116,7 +128,7 @@ def compose_plot(positions, position_args):
             ax.add_patch(pies)
 
     # Plot images
-    if positions["image_data"].shape[0] > 0:
+    if "image_data" in positions and positions["image_data"].shape[0] > 0:
         for _, row in positions["image_data"].iterrows():
             arr_img = plt.imread(
                 row["path"] + "/" + row["value"] + "." + row["filetype"]
@@ -124,7 +136,7 @@ def compose_plot(positions, position_args):
             ax.imshow(arr_img, extent=(row["xmin"], row["xmax"], row["ymin"], row["ymax"]))
 
     # Plot text
-    if positions["text_data"].shape[0] > 0:
+    if "text_data" in positions and positions["text_data"].shape[0] > 0:
         df = add_column_if_missing(
             positions["text_data"],
             ha=0.5,
@@ -200,6 +212,7 @@ def compose_plot(positions, position_args):
                 ),
             ),
         )
+        # legends do this themselves
         df = df.assign(
             x=np.add(
                 np.multiply((np.subtract(1, df["alphax"])), df["xmin"]),
@@ -238,35 +251,9 @@ def compose_plot(positions, position_args):
                 va=va,
             )
 
-    # Add size
-    minimum_x = (
-        positions["bounds"]["minimum_x"] - position_args["expand_xmin"]
-        if "expand_xmin" in position_args.keys()
-        else 0
-    )
-    maximum_x = (
-        positions["bounds"]["maximum_x"] + position_args["expand_xmax"]
-        if "expand_xmax" in position_args.keys()
-        else 0
-    )
-    minimum_y = (
-        positions["bounds"]["minimum_y"] - position_args["expand_ymin"]
-        if "expand_ymin" in position_args.keys()
-        else 0
-    )
-    maximum_y = (
-        positions["bounds"]["maximum_y"] + position_args["expand_ymax"]
-        if "expand_ymax" in position_args.keys()
-        else 0
-    )
-
-    ax.set_ylim(minimum_y, maximum_y)
-    ax.set_xlim(minimum_x, maximum_x)
-
     # Plot
     ax.axis("scaled")
     ax.axis("off")
     # Make sure that the plots are scaled correctly
-    fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
 
-    return fig
+    return fig, ax
