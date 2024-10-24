@@ -251,35 +251,9 @@ def compose_plot(positions, position_args, fig = None, ax = None):
                 va=va,
             )
 
-    # Add size
-    minimum_x = (
-        positions["bounds"]["minimum_x"] - position_args["expand_xmin"]
-        if "expand_xmin" in position_args.keys()
-        else 0
-    )
-    maximum_x = (
-        positions["bounds"]["maximum_x"] + position_args["expand_xmax"]
-        if "expand_xmax" in position_args.keys()
-        else 0
-    )
-    minimum_y = (
-        positions["bounds"]["minimum_y"] - position_args["expand_ymin"]
-        if "expand_ymin" in position_args.keys()
-        else 0
-    )
-    maximum_y = (
-        positions["bounds"]["maximum_y"] + position_args["expand_ymax"]
-        if "expand_ymax" in position_args.keys()
-        else 0
-    )
-
-    ax.set_ylim(minimum_y, maximum_y)
-    ax.set_xlim(minimum_x, maximum_x)
-
     # Plot
     ax.axis("scaled")
     ax.axis("off")
     # Make sure that the plots are scaled correctly
-    # fig.set_size_inches((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
 
     return fig, ax

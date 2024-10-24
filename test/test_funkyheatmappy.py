@@ -230,7 +230,7 @@ class Testfunkyheatmappy(object):
 
 
     def test_dynbenchmark(self, dynbenchmark_data):
-        res = funkyheatmappy.funky_heatmap(
+        funkyheatmappy.funky_heatmap(
             data=dynbenchmark_data["data"],
             column_info=dynbenchmark_data["column_info"],
             column_groups=dynbenchmark_data["column_groups"],
@@ -240,7 +240,6 @@ class Testfunkyheatmappy(object):
             position_args=position_arguments(col_annot_offset=4.2),
             legends=dynbenchmark_data["legends"]
         )
-        thing = 0
 
 
     def test_position_arguments(self, dynbenchmark_data):

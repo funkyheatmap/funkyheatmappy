@@ -245,7 +245,7 @@ def create_pie_legend(title, labels, color, position_args, label_width = 2, ax =
         "label_value": legend_data["name"],
         "ha": legend_data["ha"],
         "va": legend_data["va"],
-        "colour": legend_data["fill"] #todo return to black
+        "colour": legend_data["color"] #todo return to black
     })
 
     segment_data = pd.DataFrame(data = {
