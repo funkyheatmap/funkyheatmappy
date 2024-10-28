@@ -20,7 +20,7 @@ def verify_legends(legends, palettes, column_info, data):
     if len(missing_palettes) > 0:
         print("Some palettes were not used in the column info, adding legends for them:" + ", ".join(missing_palettes))
 
-        for i in range(len(missing_palettes)):
+        for _ in range(len(missing_palettes)):
             palette = missing_palettes.pop()
             legend = {
                 "title": palette,

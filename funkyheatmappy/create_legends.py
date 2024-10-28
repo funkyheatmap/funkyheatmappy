@@ -135,52 +135,51 @@ def create_text_legend(title, labels, size, color, values, position_args, label_
     start_y = 0
     row_height = position_args["row_height"]
 
-    legend_data = pd.DataFrame(data = {
-        "name": labels,
-        "value": values,
+    geom_data = pd.DataFrame(data = {
+        "label_value": labels,
         "colour": color,
-        "size": size,
-        "vjust": 0.5,
-        "hjust": 0,
+        "va": 0.5,
+        "ha": 1,
         "lab_y": [- row_height * i for i in range(len(labels))]
     })
+    geom_data["x"] = start_x + 2 * .5 + label_width
+    geom_data["y"] = start_y - 2 + geom_data["lab_y"]
 
-    text_data = pd.DataFrame(data = {
+    label_data = pd.DataFrame(data = {
+        "label_value": values,
+        "colour": color,
+        "va": 0.5,
+        "ha": 0,
+        "lab_y": [- row_height * i for i in range(len(labels))]
+    })
+    label_data["x"] = start_x + 2 * .5 + label_width + value_width
+    label_data["y"] = start_y - 2 + label_data["lab_y"]
+
+    title_data = pd.DataFrame(data = {
         "x": start_x,
         "y": start_y - 1,
         "label_value": title,
-        "hjust": 0,
-        "vjust": 1,
+        "ha": 0.5,
+        "va": 1,
         "fontface": "bold",
         "colour": "black"
-    })
+    }, index = [0])
 
-    text_data["x"] = start_x + 0.5
-    text_data["y"] = start_y - 2 + legend_data["lab_y"]
-    text_data["label_value"] = legend_data["name"]
-    text_data["vjust"] = legend_data["vjust"]
-    text_data["hjust"] = legend_data["hjust"]
-    text_data["colour"] = legend_data["colour"]
+    all_data = pd.concat([geom_data, label_data, title_data])
 
-    text_data["x"] = start_x + 2 * .5 + label_width
-    text_data["y"] = start_y - 2 + legend_data["lab_y"]
-    text_data["label_value"] = legend_data["value"]
-    text_data["vjust"] = legend_data["vjust"]
-    text_data["hjust"] = legend_data["hjust"]
-    text_data["colour"] = legend_data["colour"]
-
-    text_data["x_width"] = 2 * .5 + label_width + value_width
-    text_data["y_height"] = row_height
-    text_data["xmin"] = text_data["x"] - text_data["x_width"] * text_data["hjust"]
-    text_data["xmax"] = text_data["x"] + text_data["x_width"] * (1 - text_data["hjust"])
-    text_data["ymin"] = text_data["y"] - text_data["y_height"] * text_data["vjust"]
-    text_data["ymax"] = text_data["y"] + text_data["y_height"] * (1 - text_data["vjust"])
+    all_data["xwidth"] = 2 * .5 + label_width + value_width
+    all_data["yheight"] = row_height
+    all_data["xmin"] = all_data["x"] - all_data["xwidth"] * all_data["ha"]
+    all_data["xmax"] = all_data["x"] + all_data["xwidth"] * (1 - all_data["ha"])
+    all_data["ymin"] = all_data["y"] - all_data["yheight"] * all_data["va"]
+    all_data["ymax"] = all_data["y"] + all_data["yheight"] * (1 - all_data["va"])
 
     geom_positions = {
-        "text_data": text_data
+        "text_data": all_data
     }
 
-    fig, ax2 = compose_plot(geom_positions, {})
+    fig, ax2 = compose_plot(geom_positions, {}, ax = ax)
+    ax.set_ylim([all_data["ymin"].min(), all_data["ymax"].max()])
     return fig
 
 def create_pie_legend(title, labels, color, position_args, label_width = 2, ax = None, **kwargs):

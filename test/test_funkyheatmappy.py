@@ -147,13 +147,13 @@ def dynbenchmark_data():
     ]
 
     column_info["options"] = options
-    column_info.loc["method_priors_required_str", "options"]["legend"] = {
-        "legend": {
-            "": "None",
-            "✕": "Weak: Start or end cells",
-            "✖": "Strong: Cell grouping or time course",
-        }
-    }
+    # column_info.loc["method_priors_required_str", "options"]["legend"] = {
+    #     "legend": {
+    #         "": "None",
+    #         "✕": "Weak: Start or end cells",
+    #         "✖": "Strong: Cell grouping or time course",
+    #     }
+    # }
     palettes["colours"][5] = dict(zip(names_error_r, palettes["colours"][5]))
 
     legends = [
@@ -161,6 +161,7 @@ def dynbenchmark_data():
         {'title': "scaling", 'palette': 'scaling', 'enabled': True, 'geom': 'rect'},
         {'title': "benchmark", 'palette': 'benchmark', 'enabled': True, 'geom': 'funkyrect'},
         {'title': "qc", 'palette': 'qc', 'enabled': True, 'geom': 'funkyrect'},
+        {'title': "Priors Required", 'palette': 'text_black', 'enabled': True, 'geom': 'text', 'labels': ["", "✕", "✖"], 'values': ["None", "Weak: Start or end cells", "Strong: Cell grouping or time course"]},
         # {'title': "error_reasons", 'palette': 'error_reasons', 'enabled': True, 'geom': 'pie',
         #  'colors': ['#8DD3C7', '#FFFFB3', '#BEBADA', '#FB8072'],
         #  'labels': ['Memory limit exceeded', 'Time limit exceeded', 'Execution error', 'Method error']},

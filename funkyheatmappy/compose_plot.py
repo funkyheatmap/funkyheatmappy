@@ -212,7 +212,6 @@ def compose_plot(positions, position_args, fig = None, ax = None):
                 ),
             ),
         )
-        # legends do this themselves
         df = df.assign(
             x=np.add(
                 np.multiply((np.subtract(1, df["alphax"])), df["xmin"]),

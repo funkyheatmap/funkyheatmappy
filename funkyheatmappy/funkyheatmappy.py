@@ -146,11 +146,12 @@ def funky_heatmap(
         "rect": create_rect_legend,
         "circle": create_circle_legend,
         "pie": create_pie_legend,
-        # "text": create_text_legend,
+        "text": create_text_legend,
         # "bar": create_bar_legend
     }
 
-    for i, legend in enumerate(legends):
+    enabled_legends = [legend for legend in legends if legend["enabled"]]
+    for i, legend in enumerate(enabled_legends):
         if legend["geom"] in geom_legends_funs.keys():
             legend_ax = fig.add_subplot(gs[1, i])
 
@@ -169,26 +170,4 @@ def get_plot_size(positions, position_args):
     minimum_y = positions["bounds"]["minimum_y"] - position_args.get("expand_ymin", 0)
     maximum_y = positions["bounds"]["maximum_y"] + position_args.get("expand_ymax", 0)
 
-    # minimum_x = (
-    #     positions["bounds"]["minimum_x"] - position_args["expand_xmin"]
-    #     if "expand_xmin" in position_args.keys()
-    #     else 0
-    # )
-    # maximum_x = (
-    #     positions["bounds"]["maximum_x"] + position_args["expand_xmax"]
-    #     if "expand_xmax" in position_args.keys()
-    #     else 0
-    # )
-    # minimum_y = (
-    #     positions["bounds"]["minimum_y"] - position_args["expand_ymin"]
-    #     if "expand_ymin" in position_args.keys()
-    #     else 0
-    # )
-    # maximum_y = (
-    #     positions["bounds"]["maximum_y"] + position_args["expand_ymax"]
-    #     if "expand_ymax" in position_args.keys()
-    #     else 0
-    # )
-    
-    # return width and height
     return ((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)
