@@ -263,4 +263,6 @@ def create_pie_legend(title, labels, color, position_args, label_width = 2, ax =
     fig, ax2 = compose_plot(geom_positions, {}, ax = ax)
     return fig
 
-
+def create_image_legend(title, labels, values, position_args, label_width = 2, value_width = 1, ax = None, **kwargs):
+    
+    thing = 0

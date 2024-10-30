@@ -8,7 +8,7 @@ from .verify_legends import verify_legends
 from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 from .position_arguments import position_arguments
-from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend, create_pie_legend
+from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend, create_pie_legend, create_image_legend
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -139,14 +139,17 @@ def funky_heatmap(
 
     # Plot legends
 
-    # TODO text legends
     # TODO bar legends
+    # TODO image legends
+    # - TODO verify legends
+    # - TODO create legends
     geom_legends_funs = {
         "funkyrect": create_funkyrect_legend,
         "rect": create_rect_legend,
         "circle": create_circle_legend,
         "pie": create_pie_legend,
         "text": create_text_legend,
+        "image": create_image_legend,
         # "bar": create_bar_legend
     }
 

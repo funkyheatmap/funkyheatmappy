@@ -6,8 +6,6 @@ def verify_legends(legends, palettes, column_info, data):
         print("No legends were provided, trying to automatically infer legends.")
         legends = []
 
-    # deframe --> not necessary?
-
     assert isinstance(legends, list), "legends must be a list"
 
     palettes_in_col_info = column_info["palette"].unique()  
@@ -64,7 +62,7 @@ def verify_single_legend(legend, palettes, column_info):
         print(f"Legend {legend} did not contain a geom, inferring from the column_info.")
         legend["geom"] = column_info.loc[column_info["palette"] == legend["palette"], "geom"].iloc[0]
     assert "geom" in legend, "legend must have a geom"
-    assert legend["geom"] in ["circle", "rect", "funkyrect", "text", "pie", "continuous", "discrete", "bar"], "geom must be one of 'circle', 'rect', 'funkyrect', 'text', 'pie', 'continuous', 'discrete', 'bar'"
+    assert legend["geom"] in ["circle", "rect", "funkyrect", "text", "pie", "continuous", "discrete", "bar", "image"], "geom must be one of 'circle', 'rect', 'funkyrect', 'text', 'pie', 'continuous', 'discrete', 'bar', 'image"
     
     if legend["geom"] == "bar":
         print(f"Legend {legend} has a geom of 'bar', which is not yet supported. Skipping this legend.")
@@ -79,8 +77,8 @@ def verify_single_legend(legend, palettes, column_info):
             legend["labels"] = list(palettes[legend["palette"]].keys())
         elif legend["geom"] in ["circle", "rect", "funkyrect"]:
             legend["labels"] = ["0", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1"]
-        elif legend["geom"] == "text":
-            print(f"Legend {legend} has geom 'text' but no specified labels, so disabling this legend for now.")
+        elif legend["geom"] == "text" or legend["geom"] == "image":
+            print(f"Legend {legend} has geom '{legend["geom"]}' but no specified labels, so disabling this legend for now.")
             legend["enabled"] = False
             return legend
         # assert that it is a list of strings
@@ -122,6 +120,9 @@ def verify_single_legend(legend, palettes, column_info):
                 legend["color"] = [colors[i] for i in indices]
         elif legend["geom"] == "text":
             legend["color"] = "black"
+        elif legend["geom"] == "image":
+            legend["color"] = None
+            
     # assert list of strings
     # assert length is the same as labels or 1
     assert isinstance(legend["color"], list), "color must be a list"
