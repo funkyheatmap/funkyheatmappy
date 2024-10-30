@@ -130,9 +130,12 @@ def compose_plot(positions, position_args, fig = None, ax = None):
     # Plot images
     if "image_data" in positions and positions["image_data"].shape[0] > 0:
         for _, row in positions["image_data"].iterrows():
-            arr_img = plt.imread(
-                row["path"] + "/" + row["value"] + "." + row["filetype"]
-            )
+            if "path" in row and "value" in row and "filetype" in row:
+                arr_img = plt.imread(
+                    row["path"] + "/" + row["value"] + "." + row["filetype"]
+                )
+            else: #label is just "value"
+                arr_img = plt.imread(row["value"])
             ax.imshow(arr_img, extent=(row["xmin"], row["xmax"], row["ymin"], row["ymax"]))
 
     # Plot text

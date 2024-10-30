@@ -67,30 +67,34 @@ def verify_palettes(data, column_info, palettes=None):
     col_info_palettes = column_info["palette"].dropna().unique()
     rotation_counter = {"numerical": 0, "categorical": 0}
     for palette_id in col_info_palettes:
+        
         if palette_id not in palettes.keys():
             columns_tmp = column_info.loc[column_info["palette"] == palette_id, :]
             columns = columns_tmp.iloc[0, :]
 
-            if columns["geom"] == "pie":
-                palette_type = "categorical"
-            elif is_numeric_dtype(data[columns_tmp.index[0]]):
-                palette_type = "numerical"
+            if columns["geom"] == "image":
+                palettes[palette_id] = None
             else:
-                palette_type = "categorical"
+                if columns["geom"] == "pie":
+                    palette_type = "categorical"
+                elif is_numeric_dtype(data[columns_tmp.index[0]]):
+                    palette_type = "numerical"
+                else:
+                    palette_type = "categorical"
 
-            counter = rotation_counter[palette_type]
-            palette_name = list(default_palettes[palette_type].keys())[counter]
+                counter = rotation_counter[palette_type]
+                palette_name = list(default_palettes[palette_type].keys())[counter]
 
-            # increment counter
-            counter += 1
-            if counter > len(default_palettes[palette_type]) - 1:
-                counter = 0
-            rotation_counter[palette_type] = counter
+                # increment counter
+                counter += 1
+                if counter > len(default_palettes[palette_type]) - 1:
+                    counter = 0
+                rotation_counter[palette_type] = counter
 
-            palettes[palette_id] = palette_name
-        assert all(
+                palettes[palette_id] = palette_name
+        assert (palettes[palette_id] is None or all(
             isinstance(i, str) for i in palettes[palette_id]
-        ), f"palettes must be strings"
+        )), "palettes must be strings or None"
 
         pal_value = palettes[palette_id]
 

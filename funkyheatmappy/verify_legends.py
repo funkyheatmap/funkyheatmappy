@@ -112,22 +112,22 @@ def verify_single_legend(legend, palettes, column_info):
             print(f"Legend {legend} did not contain color, inferring from the palette.")
             colors = palettes[legend["palette"]]
             
-            # list or dict?
+            # list or dict? (or none for images)
             if isinstance(colors, dict):
                 legend["color"] = [colors[i] for i in legend["labels"]]
-            else:
+            elif isinstance(colors, list):
                 indices = [int(x) for x in np.linspace(0, len(colors), len(legend["labels"]), endpoint=False)] # int rounds down
                 legend["color"] = [colors[i] for i in indices]
-        elif legend["geom"] == "text":
+        if legend["geom"] == "text":
             legend["color"] = "black"
-        elif legend["geom"] == "image":
+        if legend["geom"] == "image":
             legend["color"] = None
-            
+
     # assert list of strings
     # assert length is the same as labels or 1
-    assert isinstance(legend["color"], list), "color must be a list"
+    assert legend["color"] is None or isinstance(legend["color"], list), "color must be a list"
     # assert all(isinstance(s, str) for s in legend["color"]), "color must be a list of strings"
-    assert len(legend["color"]) == 1 or len(legend["color"]) == len(legend["labels"]), "color must be the same length as labels or 1"
+    assert legend["color"] is None or len(legend["color"]) == 1 or len(legend["color"]) == len(legend["labels"]), "color must be the same length as labels or 1"
 
     # check hjust
     if "label_hjust" not in legend:
@@ -149,8 +149,8 @@ def verify_single_legend(legend, palettes, column_info):
 
     # check label_width
     if "label_width" not in legend:
-        if legend["geom"] == "text":
-            legend["label_width"] = 1
+        if legend["geom"] == "text" or legend["geom"] == "image":
+            legend["label_width"] = 2
         elif legend["geom"] == "pie":
             legend["label_width"] = 2
         else:
@@ -161,8 +161,8 @@ def verify_single_legend(legend, palettes, column_info):
 
     # check value_width
     if "value_width" not in legend:
-        if legend["geom"] == "text":
-            legend["value_width"] = 2
+        if legend["geom"] == "text" or legend["geom"] == "image":
+            legend["value_width"] = 1
         else:
             legend["value_width"] = None
     

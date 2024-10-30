@@ -264,5 +264,59 @@ def create_pie_legend(title, labels, color, position_args, label_width = 2, ax =
     return fig
 
 def create_image_legend(title, labels, values, position_args, label_width = 2, value_width = 1, ax = None, **kwargs):
-    
-    thing = 0
+    start_x = 0
+    start_y = 0
+    row_height = position_args["row_height"]
+
+    image_data = pd.DataFrame(data = {
+        "value": values,
+        "va": 0.5,
+        "ha": 1,
+        "lab_y": [- row_height * i for i in range(len(labels))]
+    })
+    image_data["x"] = start_x + 2 * .5 + value_width
+    image_data["y"] = start_y - 2 + image_data["lab_y"]
+    size = min(2 * .5 + value_width, row_height)
+    image_data["xwidth"] = size
+    image_data["yheight"] = size
+
+    image_data["xmin"] = image_data["x"] - image_data["xwidth"] * image_data["ha"]
+    image_data["xmax"] = image_data["x"] + image_data["xwidth"] * (1 - image_data["ha"])
+    image_data["ymin"] = image_data["y"] - image_data["yheight"] * image_data["va"]
+    image_data["ymax"] = image_data["y"] + image_data["yheight"] * (1 - image_data["va"])
+
+    label_data = pd.DataFrame(data = {
+        "label_value": labels,
+        "va": 0.5,
+        "ha": 0,
+        "lab_y": [- row_height * i for i in range(len(labels))]
+    })
+    label_data["x"] = start_x + 2 * .5 + value_width + label_width
+    label_data["y"] = start_y - 2 + label_data["lab_y"]
+
+    title_data = pd.DataFrame(data = {
+        "x": start_x,
+        "y": start_y - 1,
+        "label_value": title,
+        "ha": 0.5,
+        "va": 1,
+        "fontface": "bold"
+    }, index = [0])
+
+    text_data = pd.concat([label_data, title_data])
+
+    text_data["xwidth"] = 2 * .5 + value_width + label_width
+    text_data["yheight"] = row_height
+    text_data["xmin"] = text_data["x"] - text_data["xwidth"] * text_data["ha"]
+    text_data["xmax"] = text_data["x"] + text_data["xwidth"] * (1 - text_data["ha"])
+    text_data["ymin"] = text_data["y"] - text_data["yheight"] * text_data["va"]
+    text_data["ymax"] = text_data["y"] + text_data["yheight"] * (1 - text_data["va"])
+
+    geom_positions = {
+        "image_data": image_data,
+        "text_data": text_data
+    }
+
+    fig, ax2 = compose_plot(geom_positions, {}, ax = ax)
+    ax.set_ylim([text_data["ymin"].min(), text_data["ymax"].max()])
+    return fig

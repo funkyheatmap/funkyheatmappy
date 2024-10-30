@@ -140,9 +140,7 @@ def funky_heatmap(
     # Plot legends
 
     # TODO bar legends
-    # TODO image legends
-    # - TODO verify legends
-    # - TODO create legends
+    # TODO image legends: improve palettes vs legends
     geom_legends_funs = {
         "funkyrect": create_funkyrect_legend,
         "rect": create_rect_legend,
@@ -162,7 +160,7 @@ def funky_heatmap(
             legend["position_args"] = position_args
             legend_fun(**legend, ax = legend_ax)
     
-    fig.savefig("test_funky_heatmap2.png")
+    fig.savefig("test_mtcars_images.png")
 
     return fig
 

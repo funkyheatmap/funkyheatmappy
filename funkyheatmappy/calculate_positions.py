@@ -222,12 +222,21 @@ def calculate_positions(
         )
         level_heights["ymin"] = level_heights["ymax"] - level_heights["height"]
         level_heights["y"] = (level_heights["ymin"] + level_heights["ymax"]) / 2
-        palette_mids = {
-            x: palettes[x][round(len(palettes[x]) / 2)]
-            if isinstance(palettes[x], list)
-            else list(palettes[x].values())[round(len(palettes[x]) / 2)]
-            for x in palettes.keys()
-        }
+
+        palette_mids = {}
+        for x in palettes.keys():
+            if palettes[x] is not None:
+                if isinstance(palettes[x], list):
+                    palette_mids[x] = palettes[x][round(len(palettes[x]) / 2)]
+                else:
+                    palette_mids[x] = list(palettes[x].values())[round(len(palettes[x]) / 2)]
+
+    #     palette_mids = {
+    #         x: palettes[x][round(len(palettes[x]) / 2)]
+    #         if isinstance(palettes[x], list)
+    # elif palettes[x] is not None list(palettes[x].values())[round(len(palettes[x]) / 2)]
+    #         for x in palettes.keys()
+    #     }
         max_newlines = (
             col_join.groupby("level")
             .apply(lambda x: x["name"].str.count("\n").max())

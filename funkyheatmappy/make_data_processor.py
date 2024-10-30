@@ -78,7 +78,7 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
             dat = fun(dat)
 
             # determine colours
-            if pd.notna(row["palette"]):
+            if row["geom"] != "image" and pd.notna(row["palette"]):
                 palette_sel = palette_list[row["palette"]]
                 if is_string_dtype(dat["value"]):
                     dat["col_value"] = dat["value"]
