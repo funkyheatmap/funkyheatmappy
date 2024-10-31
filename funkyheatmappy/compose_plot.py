@@ -4,6 +4,7 @@ import pandas as pd
 from funkyheatmappy.add_column_if_missing import add_column_if_missing
 from matplotlib import collections as mc
 from matplotlib.patches import Rectangle, Circle, FancyBboxPatch, Wedge
+from matplotlib.image import AxesImage
 
 
 def compose_plot(positions, position_args, fig = None, ax = None):
@@ -67,6 +68,38 @@ def compose_plot(positions, position_args, fig = None, ax = None):
                 zorder=2,
             )
             ax.add_patch(rect)
+
+    # Plot bars (for legends)
+    if "bar_data" in positions and positions["bar_data"].shape[0] > 0:
+        df = add_column_if_missing(
+            positions["bar_data"], border_colour="black", border=True, alpha=1
+        )
+        df = df.assign(
+            border_colour=[
+                val if df["border"].iloc[i] else None
+                for i, val in enumerate(df["border_colour"])
+            ]
+        )
+
+        for _, row in df.iterrows():
+            label_values = np.array([float(x) for x in row["labels"] if x])
+            color_values = np.linspace(np.min(label_values), np.max(label_values), 50)
+            color_values = np.expand_dims(color_values, axis=0)
+            rect = Rectangle(
+                xy= (row["xmin"], row["ymin"]),
+                width=row["xmax"] - row["xmin"],
+                height=row["ymax"] - row["ymin"],
+                fc = None,
+                alpha = 0,
+                ec=row["border_colour"],
+                lw=1,
+                zorder=2,
+            )
+            ax.add_patch(rect)
+            im = ax.imshow(color_values, cmap = row["colourmap"], clip_path = rect, clip_on = True, extent = row[["xmin", "xmax", "ymin", "ymax"]])
+            im.set_clip_path(rect)
+            # im = AxesImage(ax, cmap = row["colour"])
+            # ax.add_patch(im)
 
     # Plot circles
     if "circle_data" in positions and positions["circle_data"].shape[0] > 0:

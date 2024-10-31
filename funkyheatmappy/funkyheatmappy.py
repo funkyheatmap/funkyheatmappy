@@ -8,7 +8,7 @@ from .verify_legends import verify_legends
 from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 from .position_arguments import position_arguments
-from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend, create_pie_legend, create_image_legend
+from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend, create_pie_legend, create_image_legend, create_bar_legend
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -148,7 +148,7 @@ def funky_heatmap(
         "pie": create_pie_legend,
         "text": create_text_legend,
         "image": create_image_legend,
-        # "bar": create_bar_legend
+        "bar": create_bar_legend
     }
 
     enabled_legends = [legend for legend in legends if legend["enabled"]]
@@ -160,7 +160,7 @@ def funky_heatmap(
             legend["position_args"] = position_args
             legend_fun(**legend, ax = legend_ax)
     
-    fig.savefig("test_mtcars_images.png")
+    fig.savefig("test_dynbenchmark.png")
 
     return fig
 

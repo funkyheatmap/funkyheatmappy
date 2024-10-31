@@ -64,10 +64,10 @@ def verify_single_legend(legend, palettes, column_info):
     assert "geom" in legend, "legend must have a geom"
     assert legend["geom"] in ["circle", "rect", "funkyrect", "text", "pie", "continuous", "discrete", "bar", "image"], "geom must be one of 'circle', 'rect', 'funkyrect', 'text', 'pie', 'continuous', 'discrete', 'bar', 'image"
     
-    if legend["geom"] == "bar":
-        print(f"Legend {legend} has a geom of 'bar', which is not yet supported. Skipping this legend.")
-        legend["enabled"] = False
-        return legend
+    # if legend["geom"] == "bar":
+    #     print(f"Legend {legend} has a geom of 'bar', which is not yet supported. Skipping this legend.")
+    #     legend["enabled"] = False
+    #     return legend
 
     # check labels
     if "labels" not in legend:
@@ -75,7 +75,7 @@ def verify_single_legend(legend, palettes, column_info):
         
         if legend["geom"] == "pie" and "palette" in legend:
             legend["labels"] = list(palettes[legend["palette"]].keys())
-        elif legend["geom"] in ["circle", "rect", "funkyrect"]:
+        elif legend["geom"] in ["circle", "rect", "funkyrect", "bar"]:
             legend["labels"] = ["0", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1"]
         elif legend["geom"] == "text" or legend["geom"] == "image":
             print(f"Legend {legend} has geom '{legend["geom"]}' but no specified labels, so disabling this legend for now.")
@@ -86,10 +86,12 @@ def verify_single_legend(legend, palettes, column_info):
     assert all(isinstance(s, str) for s in legend["labels"]), "labels must be strings"
 
     # check size
-    if legend["geom"] in ["circle", "rect", "funkyrect", "text"]:
+    if legend["geom"] in ["circle", "rect", "funkyrect", "text", "bar"]:
         if "size" not in legend:
             if legend["geom"] == "text":
                 legend["size"] = [3.88]
+            elif legend["geom"] == "bar":
+                legend["size"] = [1]
             else:
                 print(f"Legend {legend} did not contain size, inferring from the labels.")
                 legend["size"] = np.linspace(0, 1, len(legend["labels"])).tolist()
@@ -118,9 +120,9 @@ def verify_single_legend(legend, palettes, column_info):
             elif isinstance(colors, list):
                 indices = [int(x) for x in np.linspace(0, len(colors), len(legend["labels"]), endpoint=False)] # int rounds down
                 legend["color"] = [colors[i] for i in indices]
-        if legend["geom"] == "text":
-            legend["color"] = "black"
-        if legend["geom"] == "image":
+        # if legend["geom"] == "text":
+        #     legend["color"] = ["black"]
+        if legend["geom"] == "image" or legend["geom"] == "text":
             legend["color"] = None
 
     # assert list of strings

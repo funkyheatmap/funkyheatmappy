@@ -157,7 +157,7 @@ def dynbenchmark_data():
     palettes["colours"][5] = dict(zip(names_error_r, palettes["colours"][5]))
 
     legends = [
-        {'title': "stability", 'palette': 'stability', 'enabled': True, 'geom': 'funkyrect'},
+        {'title': "stability", 'palette': 'stability', 'enabled': True, 'geom': 'bar'},
         {'title': "scaling", 'palette': 'scaling', 'enabled': True, 'geom': 'rect'},
         {'title': "benchmark", 'palette': 'benchmark', 'enabled': True, 'geom': 'funkyrect'},
         {'title': "qc", 'palette': 'qc', 'enabled': True, 'geom': 'funkyrect'},
@@ -213,20 +213,29 @@ class Testfunkyheatmappy(object):
                         "name": ["Type of engine"],
                         "geom": ["image"],
                         "options": [{"path": "./test/data/", "filetype": "png"}],
-                        "palette": [np.nan],
+                        "palette": ["engine_type"],
                     },
                     index=["type"],
                 ),
             ]
         )
+
+        legends = [
+            {"title": "Engine Type", "palette": "engine_type", "enabled": True, "geom": "image",'labels': ["ice", "electric"], 'values': ["./test/data/ice.png", "./test/data/electric.png"]},
+        ]
+
+        new_palette = [{"palettes": "engine_type", "colours": None}]
+        palettes = pd.concat([mtcars["palettes"], pd.DataFrame(new_palette)], ignore_index=True)
+
         funkyheatmappy.funky_heatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
             column_groups=mtcars["column_groups"],
             row_info=mtcars["row_info"],
             row_groups=mtcars["row_groups"],
-            palettes=mtcars["palettes"],
+            palettes=palettes,
             position_args=position_arguments(expand_xmax=4),
+            legends=legends
         )
 
 
