@@ -182,17 +182,28 @@ def create_text_legend(title, labels, size, color, values, position_args, label_
     label_data["x"] = start_x + 2 * .5 + label_width + value_width
     label_data["y"] = start_y - 2 + label_data["lab_y"]
 
-    title_data = pd.DataFrame(data = {
-        "x": start_x,
-        "y": start_y - 1,
-        "label_value": title,
-        "ha": 0.5,
-        "va": 1,
-        "fontface": "bold",
-        "colour": "black"
-    }, index = [0])
+    # title_data = pd.DataFrame(data = {
+    #     "x": start_x,
+    #     "y": start_y - 1,
+    #     "label_value": title,
+    #     "ha": 0.5,
+    #     "va": 1,
+    #     "fontface": "bold",
+    #     "colour": "black"
+    # }, index = [0])
 
-    all_data = pd.concat([geom_data, label_data, title_data])
+    title_data = pd.DataFrame(data = {
+        "xmin": start_x,
+        "xmax": start_x,
+        "ymin": start_y - 1.5,
+        "ymax": start_y - 0.5,
+        "label_value": title,
+        "ha": 0,
+        "va": 1,
+        "fontweight": "bold"
+    }, index = ["title"])
+
+    all_data = pd.concat([geom_data, label_data])#, title_data])
 
     all_data["xwidth"] = 2 * .5 + label_width + value_width
     all_data["yheight"] = row_height
@@ -202,7 +213,7 @@ def create_text_legend(title, labels, size, color, values, position_args, label_
     all_data["ymax"] = all_data["y"] + all_data["yheight"] * (1 - all_data["va"])
 
     geom_positions = {
-        "text_data": all_data
+        "text_data": pd.concat([title_data, all_data])
     }
 
     fig, ax2 = compose_plot(geom_positions, {}, ax = ax)
@@ -322,15 +333,18 @@ def create_image_legend(title, labels, values, position_args, label_width = 2, v
     label_data["y"] = start_y - 2 + label_data["lab_y"]
 
     title_data = pd.DataFrame(data = {
-        "x": start_x,
-        "y": start_y - 1,
+        "xmin": start_x,
+        "xmax": start_x,
+        "ymin": start_y - 1.5,
+        "ymax": start_y - 0.5,
         "label_value": title,
         "ha": 0.5,
         "va": 1,
-        "fontface": "bold"
+        "fontweight": "bold"
     }, index = [0])
 
-    text_data = pd.concat([label_data, title_data])
+    # text_data = pd.concat([label_data, title_data])
+    text_data = label_data
 
     text_data["xwidth"] = 2 * .5 + value_width + label_width
     text_data["yheight"] = row_height
@@ -341,7 +355,7 @@ def create_image_legend(title, labels, values, position_args, label_width = 2, v
 
     geom_positions = {
         "image_data": image_data,
-        "text_data": text_data
+        "text_data": pd.concat([title_data, text_data])
     }
 
     fig, ax2 = compose_plot(geom_positions, {}, ax = ax)

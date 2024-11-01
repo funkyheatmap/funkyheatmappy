@@ -160,8 +160,6 @@ def funky_heatmap(
             legend["position_args"] = position_args
             legend_fun(**legend, ax = legend_ax)
     
-    fig.savefig("test_dynbenchmark.png")
-
     return fig
 
 

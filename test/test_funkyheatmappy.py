@@ -8,6 +8,7 @@ from funkyheatmappy.position_arguments import position_arguments
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
+import json
 
 
 @pytest.fixture(scope="session")
@@ -277,3 +278,46 @@ class Testfunkyheatmappy(object):
             palettes=dynbenchmark_data["palettes"],
             position_args=pos_arg,
         )
+
+    def test_minimal_example(self):
+        data = pd.read_csv("./test/data/minimal_data.tsv", delimiter="\t")
+        for json_col in ["categories1", "categories2", "categories3"]:
+            data[json_col] = [ json.loads(s) for s in data[json_col] ]
+
+        column_info = pd.read_csv("./test/data/minimal_column_info.tsv", delimiter="\t")
+        column_groups = pd.read_csv("./test/data/minimal_column_groups.tsv", delimiter="\t")
+        row_info = pd.read_csv("./test/data/minimal_row_info.tsv", delimiter="\t")
+        row_groups = pd.read_csv("./test/data/minimal_row_groups.tsv", delimiter="\t")
+
+        with open("./test/data/minimal_palettes.json") as f:
+            palettes = json.load(f)
+
+        column_info = column_info.rename(columns = {"directory": "path", "extension": "filetype"})
+
+        column_info.index = column_info["id"]
+        column_info["name"] = [ "" if not isinstance(name, str) else name for name in column_info["name"] ]
+        row_info.index = row_info["id"]
+
+        legends = [
+            {"title": "Image", "palette": "image", "enabled": True, "geom": "image",'labels': ["one", "two", "three"], 'values': ["./test/data/one.png", "./test/data/two.png", "./test/data/three.png"]},
+            {"title": "Text", "palette": "text", "enabled": True, "geom": "text", 
+             "labels": ["propA", "propB", "probC"], "values": ["property of A", "property of B", "property of C"]},
+        ]
+        palettes["image"] = [None]
+
+        # TODO: remove another workaround
+        # column_info = column_info[column_info["geom"] != "image"]
+        # column_groups = column_groups[column_groups["group"] != "image"]
+
+        fig = funkyheatmappy.funky_heatmap(
+            data=data,
+            column_info=column_info,
+            column_groups=column_groups,
+            row_info=row_info,
+            row_groups=row_groups,
+            palettes=palettes,
+            legends = legends
+        )
+        fig.savefig("test_minimal.png")
+
+        thing = 0

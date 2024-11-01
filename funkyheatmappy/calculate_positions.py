@@ -271,7 +271,7 @@ def calculate_positions(
             column_annotation["name"].str.contains("[a-zA-Z]")
         ]
         column_annotation["colour"] = [
-            palette_mids[col] for col in column_annotation["palette"]
+            palette_mids.get(col, 'white') for col in column_annotation["palette"]
         ]
         rect_data = pd.concat(
             [
