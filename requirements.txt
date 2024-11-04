@@ -1,1 +1,5 @@
 wheel>=0.22
+matplotlib
+numpy
+pandas
+pytest
