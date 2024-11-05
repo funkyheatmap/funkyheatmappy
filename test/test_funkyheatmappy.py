@@ -256,6 +256,23 @@ class Testfunkyheatmappy(object):
             position_args=position_arguments(expand_xmax=4),
         )
 
+    def test_mtcars_separate_size_colour(self, mtcars):
+        mtcars["data"] = (
+            mtcars["data"].sort_values(by="mpg", ascending=False).reset_index(drop=True)
+        )
+        # mtcars["column_info"] = mtcars["column_info"].drop(['wt'])
+        mtcars["column_info"]["id_size"] = mtcars["column_info"]["id"]
+        mtcars["column_info"].loc["disp", "id_size"] = "drat"
+        funkyheatmappy.funky_heatmap(
+            data=mtcars["data"],
+            column_info=mtcars["column_info"],
+            column_groups=mtcars["column_groups"],
+            row_info=mtcars["row_info"],
+            row_groups=mtcars["row_groups"],
+            palettes=mtcars["palettes"],
+            position_args=position_arguments(expand_xmax=4),
+        )
+
     def test_dynbenchmark(self, dynbenchmark_data):
         funkyheatmappy.funky_heatmap(
             data=dynbenchmark_data["data"],

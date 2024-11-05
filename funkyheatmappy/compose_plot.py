@@ -302,4 +302,4 @@ def compose_plot(positions, position_args, fig = None, ax = None):
     ax.axis("off")
     # Make sure that the plots are scaled correctly
 
-    return fig, ax
+    return fig
