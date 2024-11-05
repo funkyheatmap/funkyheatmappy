@@ -1,0 +1,30 @@
+name: documentation
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  content: write
+
+jobs:
+  docs:
+    runs-on: ubunut-latest
+    steps:
+      - uses: actions/checkou@v4
+      - uses: actions/setup-python@v5
+      - name: Install dependencies
+        run: |
+          pip install sphinx
+      - name: Sphinx build
+        run: |
+          sphinx-build docs/source docs/build
+      - name: Deploy to Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/
+          force_orphan: true
+          
