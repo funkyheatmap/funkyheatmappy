@@ -120,8 +120,7 @@ def verify_single_legend(legend, palettes, column_info):
             elif isinstance(colors, list):
                 indices = [int(x) for x in np.linspace(0, len(colors), len(legend["labels"]), endpoint=False)] # int rounds down
                 legend["color"] = [colors[i] for i in indices]
-        # if legend["geom"] == "text":
-        #     legend["color"] = ["black"]
+
         if legend["geom"] == "image" or legend["geom"] == "text":
             legend["color"] = None
 

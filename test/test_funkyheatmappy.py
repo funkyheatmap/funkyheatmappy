@@ -246,7 +246,7 @@ class Testfunkyheatmappy(object):
         # mtcars["column_info"] = mtcars["column_info"].drop(['wt'])
         mtcars["column_info"]["id_size"] = mtcars["column_info"]["id"]
         mtcars["column_info"].loc["disp", "id_size"] = "drat"
-        thing = funkyheatmappy.funky_heatmap(
+        funkyheatmappy.funky_heatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
             column_groups=mtcars["column_groups"],
@@ -255,7 +255,6 @@ class Testfunkyheatmappy(object):
             palettes=mtcars["palettes"],
             position_args=position_arguments(expand_xmax=4),
         )
-        stuff = 0
 
 
     def test_dynbenchmark(self, dynbenchmark_data):
