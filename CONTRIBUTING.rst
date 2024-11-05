@@ -24,7 +24,7 @@ Any issues tagged with "feature" can be implemented by anyone. Feel free to fork
 If you want an additional feature, feel free to open an issue_ and we will discuss whether it fits the scope of the package.
 
 .. _issue: https://github.com/funkyheatmap/funkyheatmappy/issues
-.._fork: https://github.com/funkyheatmap/funkyheatmappy/fork
+.. _fork: https://github.com/funkyheatmap/funkyheatmappy/fork
 
 Get Started!
 ------------
