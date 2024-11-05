@@ -172,14 +172,6 @@ def compose_plot(positions, position_args, fig = None, ax = None):
                 complete_path += "." + row["filetype"]
 
             arr_img = plt.imread(complete_path)
-            
-            # if "path" in row and "value" in row and "filetype" in row:
-            #     arr_img = plt.imread(
-            #         row["path"] + "/" + row["value"] + "." + row["filetype"]
-            #     )
-            # else: #label is just "value"
-            #     arr_img = plt.imread(row["value"])
-            
             ax.imshow(arr_img, extent=(row["xmin"], row["xmax"], row["ymin"], row["ymax"]))
 
     # Plot text
@@ -300,6 +292,5 @@ def compose_plot(positions, position_args, fig = None, ax = None):
     # Plot
     ax.axis("scaled")
     ax.axis("off")
-    # Make sure that the plots are scaled correctly
 
-    return fig
+    return fig, ax
