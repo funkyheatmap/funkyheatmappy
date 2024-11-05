@@ -2,7 +2,8 @@ import pandas as pd
 
 
 def verify_data(data):
-    """Check if data is panda dataframe and if matrix it makes a pandas"""
+    """Verify that the data is a pandas dataframe with at least 1 row and 1 column. If an id column is present, set it as the index."""
+    
     assert isinstance(data, pd.DataFrame), "data must be a pandas dataframe"
     assert (
         data.shape[0] >= 1 and data.shape[1] >= 1

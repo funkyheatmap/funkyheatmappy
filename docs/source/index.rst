@@ -25,7 +25,7 @@ Usage
 -----
 To use the package, import the `funkyheatmappy` module and call the `funkyheatmap` function.
 
-Documentation about the API can be found `here <autoapi/index.html>`_.
+Documentation about the API can be found `here <autoapi/funkyheatmappy/index.html>`_.
 
 Contributing
 ------------
