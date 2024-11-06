@@ -12,7 +12,7 @@ Funkyheatmap in Python: Generating Funky Heatmaps for Data Frames
 
 You can install funkyheatmappy from GitHub using the following command:
 ```
-pip install git+https://github.com/funkyheatmap/funkyheatmappy
+pip install funkyheatmappy
 ```
 
 ## Usage
