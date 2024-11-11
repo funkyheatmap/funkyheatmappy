@@ -118,9 +118,16 @@ def compose_plot(positions, position_args):
     # Plot images
     if positions["image_data"].shape[0] > 0:
         for _, row in positions["image_data"].iterrows():
-            arr_img = plt.imread(
-                row["path"] + "/" + row["value"] + "." + row["filetype"]
-            )
+            complete_path = ""
+            if "path" in row and isinstance(row["path"], str):
+                complete_path += row["path"]
+            if "value" in row and isinstance(row["value"], str):
+                complete_path += row["value"]
+            if "filetype" in row and isinstance(row["filetype"], str):
+                complete_path += "." + row["filetype"]
+
+            arr_img = plt.imread(complete_path)
+            
             ax.imshow(arr_img, extent=(row["xmin"], row["xmax"], row["ymin"], row["ymax"]))
 
     # Plot text
