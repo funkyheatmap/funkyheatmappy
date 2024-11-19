@@ -1,0 +1,19 @@
+funkyheatmappy.calculate_positions
+==================================
+
+.. py:module:: funkyheatmappy.calculate_positions
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.calculate_positions.calculate_positions
+
+
+Module Contents
+---------------
+
+.. py:function:: calculate_positions(data, column_info, row_info, column_groups, row_groups, palettes, position_args, scale_column, add_abc)
+

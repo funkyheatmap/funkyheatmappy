@@ -1,0 +1,19 @@
+funkyheatmappy.verify_column_info
+=================================
+
+.. py:module:: funkyheatmappy.verify_column_info
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_column_info.verify_column_info
+
+
+Module Contents
+---------------
+
+.. py:function:: verify_column_info(data, column_info=None)
+
