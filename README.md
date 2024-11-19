@@ -29,15 +29,15 @@ mtcars = pd.read_csv("./test/data/mtcars.csv")
 You can visualise the dataset as follows:
 
 ```python
-funkyheatmappy.funkyheatmap(mtcars)
+mtcars = mtcars.rename(columns={"Unnamed: 0": "id"})
+
+funkyheatmappy.funky_heatmap(mtcars)
 ```
 <img src="figures/mtcars_basic.png" width="75%" />
 
 However, it's easy to add some more information and style the plot better:
 
 ```python
-mtcars = mtcars.rename(columns={"Unnamed: 0": "id"})
-
 column_lists = [
   ["id", "group", "name", "geom", "options", "palette"],
   ["id", np.nan, "", "text", {"ha": 0, "width": 6}, np.nan],
@@ -58,12 +58,12 @@ column_info = pd.DataFrame(column_lists[1:], columns=column_lists[0])
 column_info.index = column_info["id"]
 
 column_groups = pd.DataFrame(columns=["Category", "group", "palette"],
-                              data = [["Overall", "overall", "overall"],
+                              data = [["Overall", "overall", "palette1"],
                                       ["Group1", "group1", "palette1"],
                                       ["Group2", "group2", "palette2"]]
                             )
 
-funkyheatmappy.funkyheatmap(mtcars, column_info = column_info, column_groups = column_groups)
+funkyheatmappy.funky_heatmap(mtcars, column_info = column_info, column_groups = column_groups)
 ```
 
 <img src="figures/mtcars_column_info.png" width="75%" />
