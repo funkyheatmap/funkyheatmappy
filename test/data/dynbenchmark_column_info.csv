@@ -1,6 +1,6 @@
 "group","id","name","geom","palette"
 "method_characteristic","method_Name","","text",NaN
-"method_characteristic","method_priors_required_str","Priors required","text",NaN
+"method_characteristic","method_priors_required_str","Priors required","text","text_black"
 "method_characteristic","method_wrapper_type","Wrapper type","text",NaN
 "method_characteristic","method_platform","Platform","text",NaN
 "method_characteristic","method_topology_inference","Topology inference","text",NaN
