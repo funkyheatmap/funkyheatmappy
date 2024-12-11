@@ -1,0 +1,19 @@
+funkyheatmappy.calculate_row_positions
+======================================
+
+.. py:module:: funkyheatmappy.calculate_row_positions
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.calculate_row_positions.calculate_row_positions
+
+
+Module Contents
+---------------
+
+.. py:function:: calculate_row_positions(row_info, row_height, row_space, row_bigspace)
+

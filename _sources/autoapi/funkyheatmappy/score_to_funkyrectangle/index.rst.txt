@@ -1,0 +1,19 @@
+funkyheatmappy.score_to_funkyrectangle
+======================================
+
+.. py:module:: funkyheatmappy.score_to_funkyrectangle
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.score_to_funkyrectangle.score_to_funkyrectangle
+
+
+Module Contents
+---------------
+
+.. py:function:: score_to_funkyrectangle(xmin, xmax, ymin, ymax, size_value, color_value=np.nan, midpoint=0.5, name=None)
+

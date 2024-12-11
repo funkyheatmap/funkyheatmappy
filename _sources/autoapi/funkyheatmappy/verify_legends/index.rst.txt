@@ -1,0 +1,22 @@
+funkyheatmappy.verify_legends
+=============================
+
+.. py:module:: funkyheatmappy.verify_legends
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_legends.verify_legends
+   funkyheatmappy.verify_legends.verify_single_legend
+
+
+Module Contents
+---------------
+
+.. py:function:: verify_legends(legends, palettes, column_info, data)
+
+.. py:function:: verify_single_legend(legend, palettes, column_info)
+

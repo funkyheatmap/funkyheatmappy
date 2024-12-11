@@ -1,0 +1,19 @@
+funkyheatmappy.compose_plot
+===========================
+
+.. py:module:: funkyheatmappy.compose_plot
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.compose_plot.compose_plot
+
+
+Module Contents
+---------------
+
+.. py:function:: compose_plot(positions, position_args, fig=None, ax=None)
+

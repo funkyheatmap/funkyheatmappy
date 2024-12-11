@@ -1,0 +1,19 @@
+funkyheatmappy.make_data_processor
+==================================
+
+.. py:module:: funkyheatmappy.make_data_processor
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.make_data_processor.make_data_processor
+
+
+Module Contents
+---------------
+
+.. py:function:: make_data_processor(data, column_pos, row_pos, scale_column, palette_list)
+

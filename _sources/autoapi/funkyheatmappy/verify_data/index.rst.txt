@@ -1,0 +1,22 @@
+funkyheatmappy.verify_data
+==========================
+
+.. py:module:: funkyheatmappy.verify_data
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_data.verify_data
+
+
+Module Contents
+---------------
+
+.. py:function:: verify_data(data)
+
+   Verify that the data is a pandas dataframe with at least 1 row and 1 column. If an id column is present, set it as the index.
+
+

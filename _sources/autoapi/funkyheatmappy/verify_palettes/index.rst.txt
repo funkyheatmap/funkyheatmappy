@@ -1,0 +1,37 @@
+funkyheatmappy.verify_palettes
+==============================
+
+.. py:module:: funkyheatmappy.verify_palettes
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_palettes.color_dict
+   funkyheatmappy.verify_palettes.vmax
+   funkyheatmappy.verify_palettes.default_palettes
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_palettes.verify_palettes
+
+
+Module Contents
+---------------
+
+.. py:data:: color_dict
+
+.. py:data:: vmax
+   :value: 101
+
+
+.. py:data:: default_palettes
+
+.. py:function:: verify_palettes(data, column_info, palettes=None)
+

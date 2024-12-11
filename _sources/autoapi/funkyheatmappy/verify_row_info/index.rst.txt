@@ -1,0 +1,19 @@
+funkyheatmappy.verify_row_info
+==============================
+
+.. py:module:: funkyheatmappy.verify_row_info
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_row_info.verify_row_info
+
+
+Module Contents
+---------------
+
+.. py:function:: verify_row_info(data, row_info=None)
+

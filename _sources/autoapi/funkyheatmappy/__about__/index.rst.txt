@@ -1,0 +1,21 @@
+funkyheatmappy.__about__
+========================
+
+.. py:module:: funkyheatmappy.__about__
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   funkyheatmappy.__about__.__version__
+
+
+Module Contents
+---------------
+
+.. py:data:: __version__
+   :value: '0.7.0'
+
+
