@@ -1,0 +1,41 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[project]
+name = "funkyheatmappy"
+version = "0.1.0"
+description = "Generate heatmap-like visualisations for benchmark data frames."
+readme = "README.md"
+license = { file  = "LICENSE" }
+maintainers = [
+    { name = "Louise Deconinck", email = "louise.deconinck@gmail.com" },
+    { name = "Artuur Couckuyt", email = "artuur_couckuyt@hotmail.com" }
+]
+authors = [
+    { name = "Louise Deconinck", email = "louise.deconinck@gmail.com" },
+    { name = "Artuur Couckuyt", email = "artuur_couckuyt@hotmail.com" }
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",    
+]
+
+dependencies = [
+    "pandas",
+    "matplotlib",
+    "numpy",
+]
+optional-dependencies.doc = [
+    "sphinx",
+    "sphinx-autoapi",
+]
+optional-dependencies.test = [
+    "pytest"
+]
+urls.documentation = "https://funkyheatmap.github.io/funkyheatmappy/"
+urls.Homepage = "https://github.com/funkyheatmap/funkyheatmappy"
+urls.Source = "https://github.com/funkyheatmap/funkyheatmappy"
