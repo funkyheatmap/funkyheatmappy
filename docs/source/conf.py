@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'funky\nheatmappy'
+project = 'funkyheatmappy'
 copyright = '2024, Artuur Couckuyt, Louise Deconinck'
 author = 'Artuur Couckuyt, Louise Deconinck'
 
@@ -26,4 +26,22 @@ exclude_patterns = []
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
-html_logo = 'https://raw.githubusercontent.com/funkyheatmap/logo/refs/heads/main/src/attempt1/funkyheatmap_edited.svg'
+html_logo = 'https://raw.githubusercontent.com/funkyheatmap/logo/refs/heads/main/src/funkyheatmap_edited.svg'
+html_sidebars = {
+    '**': [
+        'about.html',
+        'links.html',
+        'implementations.html',
+        'examples.html',
+        'navigation.html',
+    ]
+}
+
+html_theme_options = {
+    "github_user": "funkyheatmap",
+    "github_repo": "funkyheatmappy",
+    "fixed_sidebar": True,
+    "github_banner": True,
+    "github_button": False,
+    "logo": "https://raw.githubusercontent.com/funkyheatmap/logo/refs/heads/main/src/funkyheatmap_edited.svg",
+}
