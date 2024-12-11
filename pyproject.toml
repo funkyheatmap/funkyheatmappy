@@ -4,7 +4,8 @@ requires = ["hatchling"]
 
 [project]
 name = "funkyheatmappy"
-version = "0.1.0"
+dynamic = ["version"]
+# version = "0.7.0"
 description = "Generate heatmap-like visualisations for benchmark data frames."
 readme = "README.md"
 license = { file  = "LICENSE" }
@@ -39,3 +40,6 @@ optional-dependencies.test = [
 urls.documentation = "https://funkyheatmap.github.io/funkyheatmappy/"
 urls.Homepage = "https://github.com/funkyheatmap/funkyheatmappy"
 urls.Source = "https://github.com/funkyheatmap/funkyheatmappy"
+
+[tool.hatch.version]
+path = "funkyheatmappy/__about__.py"
