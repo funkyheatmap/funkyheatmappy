@@ -78,7 +78,8 @@ def verify_single_legend(legend, palettes, column_info):
         elif legend["geom"] in ["circle", "rect", "funkyrect", "bar"]:
             legend["labels"] = ["0", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1"]
         elif legend["geom"] == "text" or legend["geom"] == "image":
-            print(f"Legend {legend} has geom '{legend["geom"]}' but no specified labels, so disabling this legend for now.")
+            error_geom = "text" if legend["geom"] == "text" else "image"
+            print(f"Legend {legend} has geom '{error_geom}' but no specified labels, so disabling this legend for now.")
             legend["enabled"] = False
             return legend
         # assert that it is a list of strings
