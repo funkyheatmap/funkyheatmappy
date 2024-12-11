@@ -3,6 +3,8 @@ Tests for `funkyheatmappy` module.
 """
 import matplotlib
 import pytest
+import funkyheatmappy
+from funkyheatmappy.position_arguments import position_arguments
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
