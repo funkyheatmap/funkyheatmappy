@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Funkyheatmappy documentation
-============================
+Funkyheatmappy
+==============
 
 {funkyheatmap} allows generating heatmap-like visualisations for benchmark data frames. 
 Funky heatmaps can be fine-tuned by providing annotations of the columns and rows, 
@@ -26,6 +26,7 @@ Usage
 To use the package, import the `funkyheatmappy` module and call the `funkyheatmap` function.
 
 Documentation about the API can be found `here <autoapi/funkyheatmappy/index.html>`_.
+An example of the usage of the package can be found `here <mtcars.html>`_.
 
 Contributing
 ------------
@@ -34,10 +35,11 @@ Do not hesitate to open an issue or a pull request if you have any suggestions o
 You are free to contact the authors for any questions or collaborations, at the following email addresses:
 artuur_couckuyt@hotmail.be & louise.deconinck@gmail.com.
 
+
+Navigation
+==========
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    index
-
-
