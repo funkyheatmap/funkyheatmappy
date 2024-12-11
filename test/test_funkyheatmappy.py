@@ -3,11 +3,12 @@ Tests for `funkyheatmappy` module.
 """
 import matplotlib
 import pytest
-from funkyheatmappy import funkyheatmappy
+import funkyheatmappy
 from funkyheatmappy.position_arguments import position_arguments
 import pandas as pd
 import numpy as np
 import matplotlib.cm as cm
+import json
 
 
 @pytest.fixture(scope="session")
@@ -147,14 +148,26 @@ def dynbenchmark_data():
     ]
 
     column_info["options"] = options
-    column_info.loc["method_priors_required_str", "options"]["legend"] = {
-        "legend": {
-            "": "None",
-            "✕": "Weak: Start or end cells",
-            "✖": "Strong: Cell grouping or time course",
-        }
-    }
+    # column_info.loc["method_priors_required_str", "options"]["legend"] = {
+    #     "legend": {
+    #         "": "None",
+    #         "✕": "Weak: Start or end cells",
+    #         "✖": "Strong: Cell grouping or time course",
+    #     }
+    # }
     palettes["colours"][5] = dict(zip(names_error_r, palettes["colours"][5]))
+
+    legends = [
+        {'title': "stability", 'palette': 'stability', 'enabled': True, 'geom': 'bar'},
+        {'title': "scaling", 'palette': 'scaling', 'enabled': True, 'geom': 'rect'},
+        {'title': "benchmark", 'palette': 'benchmark', 'enabled': True, 'geom': 'funkyrect'},
+        {'title': "qc", 'palette': 'qc', 'enabled': True, 'geom': 'funkyrect'},
+        {'title': "Priors Required", 'palette': 'text_black', 'enabled': True, 'geom': 'text', 'labels': ["", "✕", "✖"], 'values': ["None", "Weak: Start or end cells", "Strong: Cell grouping or time course"]},
+        # {'title': "error_reasons", 'palette': 'error_reasons', 'enabled': True, 'geom': 'pie',
+        #  'colors': ['#8DD3C7', '#FFFFB3', '#BEBADA', '#FB8072'],
+        #  'labels': ['Memory limit exceeded', 'Time limit exceeded', 'Execution error', 'Method error']},
+    ]
+
     return {
         "data": data,
         "column_groups": column_groups,
@@ -162,12 +175,15 @@ def dynbenchmark_data():
         "row_groups": row_groups,
         "row_info": row_info,
         "palettes": palettes,
+        "legends": legends
     }
 
 
 class Testfunkyheatmappy(object):
     def test_mtcars(self, mtcars):
-        funkyheatmappy.funky_heatmap(mtcars["data"])
+        res = funkyheatmappy.funky_heatmap(mtcars["data"])
+
+        thing = 0
 
 
     def test_mtcars_extended(self, mtcars):
@@ -198,12 +214,38 @@ class Testfunkyheatmappy(object):
                         "name": ["Type of engine"],
                         "geom": ["image"],
                         "options": [{"path": "./test/data/", "filetype": "png"}],
-                        "palette": [np.nan],
+                        "palette": ["engine_type"],
                     },
                     index=["type"],
                 ),
             ]
         )
+
+        legends = [
+            {"title": "Engine Type", "palette": "engine_type", "enabled": True, "geom": "image",'labels': ["ice", "electric"], 'values': ["./test/data/ice.png", "./test/data/electric.png"]},
+        ]
+
+        new_palette = [{"palettes": "engine_type", "colours": None}]
+        palettes = pd.concat([mtcars["palettes"], pd.DataFrame(new_palette)], ignore_index=True)
+
+        funkyheatmappy.funky_heatmap(
+            data=mtcars["data"],
+            column_info=mtcars["column_info"],
+            column_groups=mtcars["column_groups"],
+            row_info=mtcars["row_info"],
+            row_groups=mtcars["row_groups"],
+            palettes=palettes,
+            position_args=position_arguments(expand_xmax=4),
+            legends=legends
+        )
+
+    def test_mtcars_separate_size_colour(self, mtcars):
+        mtcars["data"] = (
+            mtcars["data"].sort_values(by="mpg", ascending=False).reset_index(drop=True)
+        )
+        # mtcars["column_info"] = mtcars["column_info"].drop(['wt'])
+        mtcars["column_info"]["id_size"] = mtcars["column_info"]["id"]
+        mtcars["column_info"].loc["disp", "id_size"] = "drat"
         funkyheatmappy.funky_heatmap(
             data=mtcars["data"],
             column_info=mtcars["column_info"],
@@ -224,6 +266,7 @@ class Testfunkyheatmappy(object):
             row_groups=dynbenchmark_data["row_groups"],
             palettes=dynbenchmark_data["palettes"],
             position_args=position_arguments(col_annot_offset=4.2),
+            legends=dynbenchmark_data["legends"]
         )
 
 
@@ -252,3 +295,46 @@ class Testfunkyheatmappy(object):
             palettes=dynbenchmark_data["palettes"],
             position_args=pos_arg,
         )
+
+    def test_minimal_example(self):
+        data = pd.read_csv("./test/data/minimal_data.tsv", delimiter="\t")
+        for json_col in ["categories1", "categories2", "categories3"]:
+            data[json_col] = [ json.loads(s) for s in data[json_col] ]
+
+        column_info = pd.read_csv("./test/data/minimal_column_info.tsv", delimiter="\t")
+        column_groups = pd.read_csv("./test/data/minimal_column_groups.tsv", delimiter="\t")
+        row_info = pd.read_csv("./test/data/minimal_row_info.tsv", delimiter="\t")
+        row_groups = pd.read_csv("./test/data/minimal_row_groups.tsv", delimiter="\t")
+
+        with open("./test/data/minimal_palettes.json") as f:
+            palettes = json.load(f)
+
+        column_info = column_info.rename(columns = {"directory": "path", "extension": "filetype"})
+
+        column_info.index = column_info["id"]
+        column_info["name"] = [ "" if not isinstance(name, str) else name for name in column_info["name"] ]
+        row_info.index = row_info["id"]
+
+        legends = [
+            {"title": "Image", "palette": "image", "enabled": True, "geom": "image",'labels': ["one", "two", "three"], 'values': ["./test/data/one.png", "./test/data/two.png", "./test/data/three.png"]},
+            {"title": "Text", "palette": "text", "enabled": True, "geom": "text", 
+             "labels": ["propA", "propB", "probC"], "values": ["property of A", "property of B", "property of C"]},
+        ]
+        palettes["image"] = [None]
+
+        # TODO: remove another workaround
+        # column_info = column_info[column_info["geom"] != "image"]
+        # column_groups = column_groups[column_groups["group"] != "image"]
+
+        fig = funkyheatmappy.funky_heatmap(
+            data=data,
+            column_info=column_info,
+            column_groups=column_groups,
+            row_info=row_info,
+            row_groups=row_groups,
+            palettes=palettes,
+            legends = legends
+        )
+        fig.savefig("test_minimal.png")
+
+        thing = 0

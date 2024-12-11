@@ -9,6 +9,7 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
         column_sels = column_pos[column_pos["geom"].isin([patch_types])]
         column_sels = column_sels.drop(["group", "name", "do_spacing"], axis=1)
         column_sels.index.names = ["column_id"]
+        column_sels.rename(columns={"id_color": "column_color", "id_size": "column_size"}, inplace=True)
         column_sels = add_column_if_missing(column_sels, label=np.nan, scale=True)
 
         if column_sels.shape[0] == 0:
@@ -33,6 +34,18 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                 .rename(columns={index: "value"})
                 .assign(column_id=index)
             )
+
+            # change colourvalue
+            if pd.notna(row["column_color"]):
+                data_sel["color_value"] = data[row["column_color"]]
+            else:
+                data_sel["color_value"] = np.nan
+
+            # same for size
+            if pd.notna(row["column_size"]):
+                data_sel["size_value"] = data[row["column_size"]]
+            else:
+                data_sel["size_value"] = np.nan
 
             labelcolumn_sel = pd.DataFrame() if pd.isna(row["label"]) else row
 
@@ -71,23 +84,33 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                 on="column_id",
             )
 
-            if scale_column & row["scale"] & is_numeric_dtype(dat["value"]):
-                dat["value"] = dat.groupby("column_id")["value"].transform(
-                    lambda x: (x - x.min()) / (x.max() - x.min())
-                )
+            if scale_column & row['scale']:
+                if is_numeric_dtype(dat["value"]):
+                    dat["value"] = dat.groupby("column_id")["value"].transform(
+                        lambda x: (x - x.min()) / (x.max() - x.min())
+                    )
+                if all(pd.notna(dat["color_value"])) and is_numeric_dtype(dat["color_value"]):
+                    dat["color_value"] = dat.groupby("column_id")["color_value"].transform(
+                        lambda x: (x - x.min()) / (x.max() - x.min())
+                    )
+                if all(pd.notna(dat["size_value"])) and is_numeric_dtype(dat["size_value"]):
+                    dat["size_value"] = dat.groupby("column_id")["size_value"].transform(
+                        lambda x: (x - x.min()) / (x.max() - x.min())
+                    )
+            
             dat = fun(dat)
 
             # determine colours
-            if pd.notna(row["palette"]):
+            if row["geom"] != "image" and pd.notna(row["palette"]):
                 palette_sel = palette_list[row["palette"]]
-                if is_string_dtype(dat["value"]):
-                    dat["col_value"] = dat["value"]
-                elif is_numeric_dtype(dat["value"]):
+                if is_string_dtype(dat["color_value"]):
+                    dat["col_value"] = dat["color_value"]
+                elif is_numeric_dtype(dat["color_value"]):
                     dat["col_value"] = [
                         int(round(x * (len(palette_sel) - 1), 0))
                         if not np.isnan(x)
                         else pd.NA
-                        for x in dat["value"]
+                        for x in dat["color_value"]
                     ]
                 else:
                     dat["col_value"] = np.nan
@@ -97,7 +120,7 @@ def make_data_processor(data, column_pos, row_pos, scale_column, palette_list):
                         "#444444FF" if pd.isna(col_val) else palette_sel[col_val]
                         for col_val in dat["col_value"]
                     ]
-                ).drop(["col_value", "value"], axis=1)
+                ).drop(["col_value"], axis=1)
             result = pd.concat([result, dat])
         return result
 

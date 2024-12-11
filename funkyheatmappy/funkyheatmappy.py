@@ -4,9 +4,14 @@ from .verify_row_info import verify_row_info
 from .verify_column_groups import verify_column_groups
 from .verify_row_groups import verify_row_groups
 from .verify_palettes import verify_palettes
+from .verify_legends import verify_legends
 from .calculate_positions import calculate_positions
 from .compose_plot import compose_plot
 from .position_arguments import position_arguments
+from .create_legends import create_funkyrect_legend, create_rect_legend, create_circle_legend, create_text_legend, create_pie_legend, create_image_legend, create_bar_legend
+
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 
 def funky_heatmap(
@@ -16,6 +21,7 @@ def funky_heatmap(
     column_groups=None,
     row_groups=None,
     palettes=None,
+    legends=None,
     position_args=position_arguments(),
     scale_column=True,
     add_abc=True,
@@ -27,6 +33,7 @@ def funky_heatmap(
     :type data: pd.DataFrame
 
     :param column_info: A data frame describing which columns in `data` to plot.
+
         This data frame should contain the `"id"` of `"data"`as indices and
         the following columns:
 
@@ -66,6 +73,7 @@ def funky_heatmap(
         `"options"` = A dictionary with any of the options above. Any values in
         this column will be spread across the other columns. This is useful for not
         having to provide a data frame with 1000s of columns.
+
 
     :type column_info: pd.DataFrame
     :param row_info: A data frame describing the rows of `data`. This data
@@ -139,6 +147,7 @@ def funky_heatmap(
     )
     row_groups = verify_row_groups(row_info=row_info, row_groups=row_groups)
     palettes = verify_palettes(data=data, column_info=column_info, palettes=palettes)
+    legends = verify_legends(legends, palettes, column_info, data)
 
     positions = calculate_positions(
         data,
@@ -152,4 +161,49 @@ def funky_heatmap(
         add_abc,
     )
 
-    return compose_plot(positions, position_args)
+    nr_legends = sum([legend["enabled"] for legend in legends])
+    heights = [data.shape[0], 1]
+    
+    # Caculate plot size
+    width, height = get_plot_size(positions, position_args)
+
+    # Plot main figure
+    fig = plt.figure(layout = "constrained")
+    fig.set_size_inches(width, height)
+    gs = GridSpec(2, nr_legends, figure=fig, height_ratios=heights)
+    ax1 = fig.add_subplot(gs[0, :])
+    fig, ax1 = compose_plot(positions, position_args, fig, ax1)
+
+    # Plot legends
+
+    # TODO bar legends
+    # TODO image legends: improve palettes vs legends
+    geom_legends_funs = {
+        "funkyrect": create_funkyrect_legend,
+        "rect": create_rect_legend,
+        "circle": create_circle_legend,
+        "pie": create_pie_legend,
+        "text": create_text_legend,
+        "image": create_image_legend,
+        "bar": create_bar_legend
+    }
+
+    enabled_legends = [legend for legend in legends if legend["enabled"]]
+    for i, legend in enumerate(enabled_legends):
+        if legend["geom"] in geom_legends_funs.keys():
+            legend_ax = fig.add_subplot(gs[1, i])
+
+            legend_fun = geom_legends_funs[legend["geom"]]
+            legend["position_args"] = position_args
+            legend_fun(**legend, ax = legend_ax)
+    
+    return fig
+
+
+def get_plot_size(positions, position_args):
+    minimum_x = positions["bounds"]["minimum_x"] - position_args.get("expand_xmin", 0)
+    maximum_x = positions["bounds"]["maximum_x"] + position_args.get("expand_xmax", 0)
+    minimum_y = positions["bounds"]["minimum_y"] - position_args.get("expand_ymin", 0)
+    maximum_y = positions["bounds"]["maximum_y"] + position_args.get("expand_ymax", 0)
+
+    return ((abs(minimum_x) + abs(maximum_x)) / 2, (abs(minimum_y) + abs(maximum_y)) / 2)

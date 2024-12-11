@@ -66,7 +66,7 @@ def calculate_positions(
     )
 
     def circle_fun(dat):
-        dat = dat.assign(x0=dat["x"], y0=dat["y"], r=row_height / 2 * dat["value"])
+        dat = dat.assign(x0=dat["x"], y0=dat["y"], r=row_height / 2 * dat["size_value"])
         return dat
 
     circle_data = data_processor("circle", circle_fun)
@@ -84,10 +84,11 @@ def calculate_positions(
                     xmax=row["xmax"],
                     ymin=row["ymin"],
                     ymax=row["ymax"],
-                    value=row["value"],
+                    size_value=row["size_value"],
+                    color_value=row["color_value"],
                     midpoint=0.8,
                 )
-                for _, row in dat[["xmin", "xmax", "ymin", "ymax", "value"]].iterrows()
+                for _, row in dat[["xmin", "xmax", "ymin", "ymax", "size_value", "color_value"]].iterrows()
             ]
         )
         return result
@@ -97,8 +98,8 @@ def calculate_positions(
     def bar_fun(dat):
         dat = add_column_if_missing(dat, hjust=0)
         dat = dat.assign(
-            xmin=dat["xmin"] + (1 - dat["value"]) * dat["xwidth"] * dat["hjust"],
-            xmax=dat["xmax"] - (1 - dat["value"]) * dat["xwidth"] * (1 - dat["hjust"]),
+            xmin=dat["xmin"] + (1 - dat["size_value"]) * dat["xwidth"] * dat["hjust"],
+            xmax=dat["xmax"] - (1 - dat["size_value"]) * dat["xwidth"] * (1 - dat["hjust"]),
         )
         return dat
 
@@ -116,7 +117,7 @@ def calculate_positions(
             .sort_values(["x", "xend"])
             .reset_index(drop=True)
             .drop_duplicates()
-            .assign(palette=np.nan, value=np.nan)
+            .assign(palette=np.nan, size_value=np.nan, color_value = np.nan)
         )
         return result
 
@@ -133,7 +134,7 @@ def calculate_positions(
     def pie_fun(dat):
         result = pd.DataFrame()
         for _, row in dat.iterrows():
-            value_df = pd.DataFrame(row["value"], index=["end_angle"]).transpose()
+            value_df = pd.DataFrame(row["size_value"], index=["end_angle"]).transpose()
             pctgs = value_df["end_angle"] / value_df["end_angle"].sum()
             value_df = (value_df / value_df.sum()) * 360
             value_df = value_df.cumsum().fillna(0)
@@ -148,11 +149,11 @@ def calculate_positions(
             value_df["x0"] = row["x"]
             value_df["y0"] = row["y"]
             value_df["row_id"] = row["row_id"]
-            value_df["value"] = value_df.index
+            value_df["size_value"] = value_df.index
             value_df["pctgs"] = pctgs
             result = pd.concat([result, value_df])
-        result = result.dropna(subset="value", axis=0)
-        dat = result.merge(dat.drop("value", axis=1), on=["row_id"], how="left")
+        result = result.dropna(subset="size_value", axis=0)
+        dat = result.merge(dat.drop("size_value", axis=1), on=["row_id"], how="left")
         return dat
 
     pie_data = data_processor("pie", pie_fun)
@@ -222,12 +223,21 @@ def calculate_positions(
         )
         level_heights["ymin"] = level_heights["ymax"] - level_heights["height"]
         level_heights["y"] = (level_heights["ymin"] + level_heights["ymax"]) / 2
-        palette_mids = {
-            x: palettes[x][round(len(palettes[x]) / 2)]
-            if isinstance(palettes[x], list)
-            else list(palettes[x].values())[round(len(palettes[x]) / 2)]
-            for x in palettes.keys()
-        }
+
+        palette_mids = {}
+        for x in palettes.keys():
+            if palettes[x] is not None:
+                if isinstance(palettes[x], list):
+                    palette_mids[x] = palettes[x][round(len(palettes[x]) / 2)]
+                else:
+                    palette_mids[x] = list(palettes[x].values())[round(len(palettes[x]) / 2)]
+
+    #     palette_mids = {
+    #         x: palettes[x][round(len(palettes[x]) / 2)]
+    #         if isinstance(palettes[x], list)
+    # elif palettes[x] is not None list(palettes[x].values())[round(len(palettes[x]) / 2)]
+    #         for x in palettes.keys()
+    #     }
         max_newlines = (
             col_join.groupby("level")
             .apply(lambda x: x["name"].str.count("\n").max())
@@ -262,7 +272,7 @@ def calculate_positions(
             column_annotation["name"].str.contains("[a-zA-Z]")
         ]
         column_annotation["colour"] = [
-            palette_mids[col] for col in column_annotation["palette"]
+            palette_mids.get(col, 'white') for col in column_annotation["palette"]
         ]
         rect_data = pd.concat(
             [
@@ -415,285 +425,6 @@ def calculate_positions(
             ]
         ]
     )
-
-    # Create legends
-    legend_pos = minimum_y
-
-    # Pie legend
-    if any(column_pos["geom"] == "pie"):
-        rel_cols = (
-            column_pos[column_pos["geom"] == "pie"]
-            .sort_values("x")
-            .groupby("palette")
-            .first()
-        )
-        for palette_label, row in rel_cols.iterrows():
-            palette = palettes[palette_label]
-            pie_minimum_x = row["xmin"]
-
-            pie_legenddf = pd.DataFrame.from_dict(
-                palette, orient="index", columns=["fill"]
-            )
-            r = np.append(np.arange(90, -90, -(180 / len(palette))), [-90])
-            angles = [i if i >= 0 else i + 360 for i in r]
-
-            pie_legenddf["start_angle"] = angles[1 : len(palette) + 1]
-            pie_legenddf["end_angle"] = angles[0 : len(palette)]
-            pie_legenddf["rad_start"] = np.linspace(0, np.pi, len(palette) + 1)[:-1]
-            pie_legenddf["rad_end"] = np.linspace(0, np.pi, len(palette) + 1)[1:]
-            pie_legenddf["rad"] = (
-                pie_legenddf["rad_end"] + pie_legenddf["rad_start"]
-            ) / 2
-            pie_legenddf["color"] = "black"
-            pie_legenddf["labx"] = row_height * np.sin(pie_legenddf["rad"])
-            begin = row_height * np.cos(pie_legenddf["rad"].iloc[0]) + 0.2
-            end = row_height * np.cos(pie_legenddf["rad"].iloc[len(palette) - 1]) - 0.2
-            pie_legenddf["laby"] = np.linspace(begin, end, len(palette))
-            pie_legenddf["ha"] = 0
-            pie_legenddf["va"] = 0.5
-            pie_legenddf["xpt"] = row_height * np.sin(pie_legenddf["rad"])
-            pie_legenddf["ypt"] = row_height * np.cos(pie_legenddf["rad"])
-
-            pie_title_data = pd.DataFrame(
-                {
-                    "xmin": pie_minimum_x,
-                    "xmax": pie_minimum_x,
-                    "ymin": legend_pos - 1.5,
-                    "ymax": legend_pos - 0.5,
-                    "label_value": row["name"],
-                    "ha": 0,
-                    "va": 1,
-                    "fontweight": "bold",
-                },
-                index=["pie_title"],
-            )
-
-            pie_pie_data = pd.DataFrame(
-                {
-                    "x0": pie_minimum_x,
-                    "y0": legend_pos - 2.75,
-                    "height": row_height * 0.75,
-                    "start_angle": pie_legenddf["start_angle"],
-                    "end_angle": pie_legenddf["end_angle"],
-                    "colour": pie_legenddf["fill"],
-                }
-            )
-
-            pie_text_data = pd.DataFrame(
-                {
-                    "x": pie_minimum_x + 0.5 + pie_legenddf["labx"],
-                    "xmin": pie_minimum_x + 0.5 + pie_legenddf["labx"],
-                    "xmax": pie_minimum_x + 0.5 + pie_legenddf["labx"],
-                    "y": legend_pos - 2.75 + pie_legenddf["laby"],
-                    "ymin": legend_pos - 2.75 + pie_legenddf["laby"] - 0.4,
-                    "ymax": legend_pos - 2.75 + pie_legenddf["laby"] + 0.4,
-                    "label_value": pie_legenddf.index,
-                    "ha": pie_legenddf["ha"],
-                    "va": pie_legenddf["va"],
-                    "colour": pie_legenddf["color"],
-                }
-            )
-
-            pie_seg_data = pd.DataFrame(
-                {
-                    "x": pie_minimum_x + pie_legenddf["xpt"] * 0.85,
-                    "xend": pie_minimum_x + pie_legenddf["xpt"] * 1.1,
-                    "y": legend_pos - 2.75 + pie_legenddf["ypt"] * 0.85,
-                    "yend": legend_pos - 2.75 + pie_legenddf["ypt"] * 1.1,
-                }
-            )
-
-            text_data = pd.concat([text_data, pie_title_data, pie_text_data])
-            pie_data = pd.concat([pie_data, pie_pie_data])
-            segment_data = pd.concat([segment_data, pie_seg_data])
-
-    # Funky rectangle legend
-    if any(column_pos["geom"] == "funkyrect"):
-        fr_minimum_x = column_pos[column_pos["geom"] == "funkyrect"]["xmin"].min()
-        fr_legend_size = 1
-        fr_legend_space = 0.2
-        fr_legend_dat1 = pd.DataFrame(
-            {
-                "value": np.append(np.arange(0, 1, 0.1), 1),
-                "xmin": 0,
-                "xmax": col_width * fr_legend_size,
-                "ymin": 0,
-                "ymax": col_width * fr_legend_size,
-            }
-        )
-
-        fr_legend_dat2 = pd.concat(
-            [
-                score_to_funkyrectangle(
-                    xmin=row["xmin"],
-                    xmax=row["xmax"],
-                    ymin=row["ymin"],
-                    ymax=row["ymax"],
-                    value=row["value"],
-                    midpoint=0.8,
-                )
-                for _, row in fr_legend_dat1[
-                    ["xmin", "xmax", "ymin", "ymax", "value"]
-                ].iterrows()
-            ]
-        )
-
-        fr_legend_dat2["minx"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: min(col["x"] - col["r"]))
-        ).tolist()
-        fr_legend_dat2["maxx"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: max(col["x"] + col["r"]))
-        ).tolist()
-        fr_legend_dat2["miny"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: min(col["y"] - col["r"]))
-        ).tolist()
-        fr_legend_dat2["maxy"] = (
-            fr_legend_dat2.groupby("value").apply(lambda col: max(col["y"] + col["r"]))
-        ).tolist()
-        fr_legend_dat2 = fr_legend_dat2.reset_index(drop=True)
-        fr_legend_dat2["w"] = fr_legend_dat2["w"].fillna(
-            fr_legend_dat2["maxx"] - fr_legend_dat2["minx"]
-        )
-        fr_legend_dat2["h"] = fr_legend_dat2["h"].fillna(
-            fr_legend_dat2["maxy"] - fr_legend_dat2["miny"]
-        )
-        xmin = (
-            (fr_legend_dat2["w"] + fr_legend_space).cumsum()
-            - fr_legend_dat2["w"]
-            - fr_legend_space
-        )
-        fr_legend_dat2["xmin"] = fr_minimum_x + xmin - min(xmin)
-        fr_legend_dat2["xmax"] = fr_legend_dat2["xmin"] + fr_legend_dat2["w"]
-        fr_legend_dat2["ymin"] = legend_pos - 2.5
-        fr_legend_dat2["ymax"] = fr_legend_dat2["ymin"] + fr_legend_dat2["h"]
-        fr_legend_dat2["x"] = (fr_legend_dat2["xmin"] + fr_legend_dat2["xmax"]) / 2
-        fr_legend_dat2["y"] = (fr_legend_dat2["ymin"] + fr_legend_dat2["ymax"]) / 2
-        fr_legend_dat2 = fr_legend_dat2[
-            ["x", "y", "value", "xmin", "xmax", "ymin", "ymax", "w", "h", "corner_size"]
-        ]
-        fr_maximum_x = fr_legend_dat2["xmax"].max()
-
-        grey_palette = default_palettes["numerical"]["Greys"]
-        fr_poly_data2 = pd.DataFrame(
-            {
-                "xmin": fr_legend_dat2["x"] - fr_legend_size / 2,
-                "xmax": fr_legend_dat2["x"] + fr_legend_size / 2,
-                "ymin": fr_legend_dat2["y"] - fr_legend_size / 2,
-                "ymax": fr_legend_dat2["y"] + fr_legend_size / 2,
-                "value": fr_legend_dat2["value"],
-            }
-        )
-
-        fr_poly_data2 = pd.concat(
-            [
-                score_to_funkyrectangle(
-                    xmin=row["xmin"],
-                    xmax=row["xmax"],
-                    ymin=row["ymin"],
-                    ymax=row["ymax"],
-                    value=row["value"],
-                    midpoint=0.8,
-                )
-                for _, row in fr_legend_dat2.iterrows()
-            ]
-        )
-        fr_poly_data2["col_value"] = round(
-            fr_poly_data2["value"] * (len(grey_palette) - 1)
-        )
-        fr_poly_data2["colour"] = [
-            "#444444FF" if np.isnan(col_val) else grey_palette[int(col_val)]
-            for col_val in fr_poly_data2["col_value"]
-        ]
-
-        fr_title_data = pd.DataFrame(
-            {
-                "xmin": [fr_minimum_x],
-                "xmax": [fr_maximum_x],
-                "ymin": [legend_pos - 1.5],
-                "ymax": [legend_pos - 0.5],
-                "label_value": ["Score"],
-                "ha": [0],
-                "va": [1],
-                "fontweight": ["bold"],
-            }
-        )
-        fr_value_data = fr_legend_dat2[fr_legend_dat2["value"] % 0.2 == 0]
-        fr_value_data = pd.DataFrame(
-            {
-                "ymin": fr_value_data["ymin"] - 1,
-                "ymax": fr_value_data["ymin"],
-                "xmin": fr_value_data["xmin"],
-                "xmax": fr_value_data["xmax"],
-                "ha": 0.5,
-                "va": 0,
-                "label_value": [
-                    round(val, 0) if val in [0, 1] else round(val, 1)
-                    for val in fr_value_data["value"]
-                ],
-            }
-        )
-
-        text_data = pd.concat([text_data, fr_title_data, fr_value_data])
-        funkyrect_data = pd.concat([funkyrect_data, fr_poly_data2])
-
-    # Text legend
-    df_text_legend = column_info[
-        (column_info["geom"] == "text")
-        & pd.notna(column_info["legend"])
-        & (column_info["legend"] != False)
-    ]
-    if df_text_legend.shape[0] > 0:
-        pr_minimum_x = column_pos.loc[[df_text_legend.index[0]]]["xmin"].min()
-        legend_vals = pd.DataFrame.from_dict(
-            df_text_legend["legend"].values[0], orient="columns"
-        )
-        legend_vals["legend_vals"] = legend_vals.index
-        legend_vals = legend_vals.reset_index(drop=True)
-        pr_labels_df = legend_vals.assign(
-            lab_x1=pr_minimum_x,
-            lab_x2=pr_minimum_x + 1,
-            lab_y=legend_pos - 1 - (legend_vals.index + 1) * row_height * 0.9,
-        )
-
-        pr_text_data = pd.concat(
-            [
-                pd.DataFrame(
-                    {
-                        "xmin": [pr_minimum_x],
-                        "xmax": [pr_minimum_x],
-                        "ymin": [legend_pos - 1.5],
-                        "ymax": [legend_pos - 0.5],
-                        "label_value": [df_text_legend["name"].values[0]],
-                        "ha": 0,
-                        "va": 1,
-                        "fontweight": ["bold"],
-                    }
-                ),
-                pd.DataFrame(
-                    {
-                        "xmin": pr_labels_df["lab_x1"],
-                        "xmax": pr_labels_df["lab_x1"],
-                        "ymin": pr_labels_df["lab_y"],
-                        "ymax": pr_labels_df["lab_y"],
-                        "label_value": pr_labels_df["legend_vals"],
-                        "ha": 0,
-                        "va": 0,
-                    }
-                ),
-                pd.DataFrame(
-                    {
-                        "xmin": pr_labels_df["lab_x2"],
-                        "xmax": pr_labels_df["lab_x2"],
-                        "ymin": pr_labels_df["lab_y"],
-                        "ymax": pr_labels_df["lab_y"],
-                        "label_value": pr_labels_df["legend"],
-                        "ha": 0,
-                        "va": 0,
-                    }
-                ),
-            ]
-        )
-        text_data = pd.concat([text_data, pr_text_data])
 
     # Simplify certain geoms
     if funkyrect_data.shape[0] > 0:
