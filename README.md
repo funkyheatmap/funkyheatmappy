@@ -1,5 +1,5 @@
 <img
-  src="https://raw.githubusercontent.com/funkyheatmap/logo/refs/heads/main/src/attempt1/funkyheatmap_edited.svg"
+  src="https://raw.githubusercontent.com/funkyheatmap/logo/refs/heads/main/src/funkyheatmap_edited.svg"
   class="dark-light" align="right" width="150" alt="image"
 />
 
