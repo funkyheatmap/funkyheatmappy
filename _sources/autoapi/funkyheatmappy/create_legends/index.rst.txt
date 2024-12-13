@@ -1,0 +1,49 @@
+funkyheatmappy.create_legends
+=============================
+
+.. py:module:: funkyheatmappy.create_legends
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.create_legends.score_to_funky_rectangle
+   funkyheatmappy.create_legends.create_title
+   funkyheatmappy.create_legends.create_label_data
+   funkyheatmappy.create_legends.create_generic_geom_legend
+   funkyheatmappy.create_legends.create_funkyrect_legend
+   funkyheatmappy.create_legends.create_rect_legend
+   funkyheatmappy.create_legends.create_bar_legend
+   funkyheatmappy.create_legends.create_circle_legend
+   funkyheatmappy.create_legends.create_text_legend
+   funkyheatmappy.create_legends.create_pie_legend
+   funkyheatmappy.create_legends.create_image_legend
+
+
+Module Contents
+---------------
+
+.. py:function:: score_to_funky_rectangle(row)
+
+.. py:function:: create_title(title, start_x, start_y)
+
+.. py:function:: create_label_data(labels, sizes, width, height, legend_space)
+
+.. py:function:: create_generic_geom_legend(title, geom, labels, size, color, position_args, label_hjust, ax=None)
+
+.. py:function:: create_funkyrect_legend(title, labels, size, color, position_args, label_hjust=0.5, ax=None, **kwargs)
+
+.. py:function:: create_rect_legend(title, labels, size, color, position_args, label_hjust=0.5, ax=None, **kwargs)
+
+.. py:function:: create_bar_legend(title, labels, size, color, position_args, label_hjust=0.5, ax=None, **kwargs)
+
+.. py:function:: create_circle_legend(title, labels, size, color, position_args, label_hjust=0.5, ax=None, **kwargs)
+
+.. py:function:: create_text_legend(title, labels, size, color, values, position_args, label_width=1, value_width=2, ax=None, **kwargs)
+
+.. py:function:: create_pie_legend(title, labels, color, position_args, label_width=2, ax=None, **kwargs)
+
+.. py:function:: create_image_legend(title, labels, values, position_args, label_width=2, value_width=1, ax=None, **kwargs)
+

@@ -1,0 +1,19 @@
+funkyheatmappy.verify_column_groups
+===================================
+
+.. py:module:: funkyheatmappy.verify_column_groups
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_column_groups.verify_column_groups
+
+
+Module Contents
+---------------
+
+.. py:function:: verify_column_groups(column_info, column_groups=None)
+

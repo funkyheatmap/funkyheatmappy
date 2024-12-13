@@ -1,0 +1,19 @@
+funkyheatmappy.calculate_column_positions
+=========================================
+
+.. py:module:: funkyheatmappy.calculate_column_positions
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.calculate_column_positions.calculate_column_positions
+
+
+Module Contents
+---------------
+
+.. py:function:: calculate_column_positions(column_info, col_space, col_bigspace)
+

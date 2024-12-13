@@ -1,0 +1,19 @@
+funkyheatmappy.add_column_if_missing
+====================================
+
+.. py:module:: funkyheatmappy.add_column_if_missing
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.add_column_if_missing.add_column_if_missing
+
+
+Module Contents
+---------------
+
+.. py:function:: add_column_if_missing(df, **kwargs)
+

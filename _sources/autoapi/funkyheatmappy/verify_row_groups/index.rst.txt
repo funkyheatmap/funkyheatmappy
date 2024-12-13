@@ -1,0 +1,19 @@
+funkyheatmappy.verify_row_groups
+================================
+
+.. py:module:: funkyheatmappy.verify_row_groups
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   funkyheatmappy.verify_row_groups.verify_row_groups
+
+
+Module Contents
+---------------
+
+.. py:function:: verify_row_groups(row_info, row_groups=None)
+
